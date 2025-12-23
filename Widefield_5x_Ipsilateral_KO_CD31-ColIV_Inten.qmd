@@ -313,7 +313,7 @@ ColIV_Vas_box |  ColIV_nonVas_box
 ```
 @fig-ColIV_boxplot shows that ColIV expression (vascular associated and total) increases after injury in a similar way for WT and KO mice. We expect no further readout in the statistical modeling.  
 
-## Statistical modeling for KLF4 spatial intensity
+## Statistical modeling for ColIV spatial intensity
 
 Given the previous readout, we'll fit a single model for the total ColIV expression using a student distribution.
 
@@ -420,18 +420,19 @@ ColIV_Int_Contrast <- ColIV_Int_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-300, 400),
                       breaks = seq(-300, 400, 200) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.82, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = ColIV_Int_Contrast , 
   filename = "Plots/Widefield_5x_Ipsilateral_KO_CD31-ColIV_Inten/Widefield_5x_Ipsilateral_KO_CD31-ColIV_Inten.png", 
-  width    = 7, 
-  height   = 7, 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 ColIV_Int_Contrast 

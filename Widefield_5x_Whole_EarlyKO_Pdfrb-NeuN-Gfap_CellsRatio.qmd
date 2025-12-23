@@ -1,0 +1,767 @@
+---
+title: "Analysis of the hemispheric cell ratio (Ipsilateral/contralateral) for PDGFR-β, NeuN and GFAP-stained brain sections (whole brain) from KLF4-KO mice"
+subtitle: "Data analysis notebook"
+author: 
+  - name: "Daniel Manrique-Castano"
+    orcid: 0000-0002-1912-1764
+    degrees:
+      - PhD
+    affiliation: 
+      - name: Univerisity Laval 
+        department: Psychiatry and Neuroscience
+        group: Laboratory of neurovascular interactions 
+note: "GitHub: https://daniel-manrique.github.io/"
+
+keywords: 
+  - KLF4
+  - PDGFR-β
+  - GFAP
+  - NeuN
+  - Brain injury
+  - MCAO
+
+license: "CC BY"
+
+format:
+   pdf: 
+    toc: true
+    number-sections: true
+    colorlinks: true
+   html:
+    code-fold: true
+    embed-resources: true
+    toc: true
+    toc-depth: 2
+    toc-location: left
+    theme: spacelab
+
+knitr:
+  opts_chunk: 
+    warning: false
+    message: false
+
+csl: science.csl
+bibliography: references.bib
+---
+
+# Preview
+
+In this notebook, we analyze the hemispheric ratio (ipsilateral/contralateral) of PDGFR-β, NeuN, and GFAP+ cells.
+
+**Parent dataset:** PDGFR-β, NeuN, and GFAP-stained ischemic brains imaged at 5x (with stitching). Samples belong to KLK4-KO mice and corresponding controls 25 days post-ischemia (DPI).Raw images are available in the Zenodo repository. 
+
+**Working dataset**: .csv files generated using a [batch script](https://github.com/elalilab/Stroke_PDGFR-B_Reactivity/blob/main/Widefield_5x_Whole_EarlyKO_Pdfrb-NeuN-Gfap_Annotations.qmd) containing the cell ratio in different brain regions.
+
+# Install and load required packages
+
+Install and load all required packages. Please uncomment (delete #) the line code if installation is required. Load the installed libraries each time you start a new R session.
+
+```{r}
+#| label: Install_Packages
+#| include: true
+#| warning: false
+#| message: false
+
+#install.packages("devtools")
+#library(devtools)
+
+#install.packages(c("bayesplot", "bayestestR", "brms","broom.mixed", "dplyr", "easystats", "distributional", "ggplot","modelbased", "modelr", "patchwork", "poorman","reshape2", "tidybayes", "tidyverse"))
+
+library(bayesplot)
+library(bayestestR)
+library(brms)
+library(broom.mixed)
+library(dplyr)
+library(easystats)
+library(distributional)
+library(ggplot2)
+library(ggridges)
+library(gtsummary)
+library(modelbased)
+library(modelr)
+library(modelsummary)
+library(patchwork)
+library(poorman)
+library(reshape2)
+library(tidybayes)
+library(tidyverse)
+```
+# Visual themes
+
+We use this visual theme to add aesthetics to our plots.
+
+```{r}
+#| label: Plot_Theme
+#| include: true
+#| warning: false
+#| message: false
+  
+Plot_theme <- theme_classic() +
+  theme(
+      plot.title = element_text(size=18, hjust = 0.5, face="bold"),
+      plot.subtitle = element_text(size = 10, color = "black"),
+      plot.caption = element_text(size = 12, color = "black"),
+      axis.line = element_line(colour = "black", size = 1.5, linetype = "solid"),
+      axis.ticks.length=unit(7,"pt"),
+     
+      axis.title.x = element_text(colour = "black", size = 16),
+      axis.text.x = element_text(colour = "black", size = 16, angle = 0, hjust = 0.5),
+      axis.ticks.x = element_line(colour = "black", size = 1),
+      
+      axis.title.y = element_text(colour = "black", size = 16),
+      axis.text.y = element_text(colour = "black", size = 16),
+      axis.ticks.y = element_line(colour = "black", size = 1),
+      
+      legend.position="right",
+      legend.direction="vertical",
+      legend.title = element_text(colour="black", face="bold", size=12),
+      legend.text = element_text(colour="black", size=10),
+      
+      plot.margin = margin(t = 10,  # Top margin
+                             r = 2,  # Right margin
+                             b = 10,  # Bottom margin
+                             l = 10) # Left margin
+      ) 
+```
+
+# Analysis for NeuN
+
+We start analyzing the ratio of NeuN+ cells.
+
+## Load and prepare the data set
+
+We load the `Widefield_5x_Whole_EarlyKO_NeuN.csv` dataset for NeuN
+
+```{r}
+#| label: tbl-NeuN_Table
+#| include: true
+#| warning: false
+#| message: false
+#| tbl-cap: "Dataset for NeuN+ cells ratio"
+
+NeuN_Ratio <- read.csv("Data_Processed/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap/Widefield_5x_Whole_EarlyKO_NeuN.csv")
+
+gt::gt(NeuN_Ratio[1:10,])
+```
+
+Now, we transform the table to a long format
+
+```{r}
+#| label: NeuN_LongTable
+#| include: true
+#| warning: false
+#| message: false
+
+NeuN_Regions_Long <- subset(NeuN_Ratio, select = -c(Hemis_diff, X))
+  
+NeuN_Regions_Long <-  melt(NeuN_Regions_Long, id.vars = c("MouseId", "Condition", "Genotype"))
+
+names(NeuN_Regions_Long)[names(NeuN_Regions_Long) == 'variable'] <- 'Region'
+names(NeuN_Regions_Long)[names(NeuN_Regions_Long) == 'value'] <- 'Ratio'
+
+NeuN_Regions_Long$Genotype <- factor(NeuN_Regions_Long$Genotype, levels = c("Klf4+/+", "Klf4-/-")) 
+```
+
+
+## Exploratory data visualization
+
+We'll begin by visualizing the ratio per brain region. 
+
+```{r}
+#| label: fig-NeuN_Regions_EDA
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Exploratory data visualization for NeuN ratio in different regions 
+#| fig-height: 5
+#| fig-width: 8
+
+
+### Ridges plot
+
+NeuN_Regions_Ridges <- 
+  ggplot(NeuN_Regions_Long, 
+         aes(x = Ratio, 
+             y = Region, 
+             fill = Genotype,
+             color = Genotype)) +
+  
+  geom_density_ridges(
+    jittered_points = TRUE, 
+    position = "raincloud",
+    rel_min_height = 0.01,
+    alpha = 0.5, scale = 0.9
+  ) +
+  
+  scale_y_discrete(
+    name= " Brain Region",
+    labels = c("Cortex", "Nuclei", "Interebrain", "Midbrain", "Fibers")) +
+  
+  scale_x_continuous(
+    name="NeuN+ cells ratio (Ipsilateral / Contralateral) ",
+    limits=c(0, 1.5), 
+    breaks=seq(0,1.5,0.3)) +
+  
+  scale_fill_manual(
+    values= c("#27AE60", "#E74C3C"),
+    name="Genotype",
+    breaks=c("Klf4+/+", "Klf4-/-"),
+    labels=c("KLF4+/+", "KLF4-/-")) +
+  
+   scale_color_manual(
+     values= c("#27AE60", "#E74C3C"),
+     name="Genotype",
+     breaks=c("Klf4+/+", "Klf4-/-"),
+     labels=c("KLF4+/+", "KLF4-/-")) +
+ 
+  Plot_theme
+
+NeuN_Regions_Ridges 
+```
+@fig-NeuN_Regions_EDA shows that there are not major deviations in the cell ratio between the two genotypes. Next, we visualize the cell ratios for the whole brain:
+
+```{r}
+#| label: fig-NeuN_Brain_EDA
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Exploratory data visualization for brain shrinkage 
+#| fig-height: 5
+#| fig-width: 5
+
+set.seed(8807)
+
+NeuN_Ratio_box <- 
+  ggplot(NeuN_Ratio, 
+         aes(x = Genotype, 
+             y = Hemis_diff, 
+             color = Genotype)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(width = 0.2) +
+  scale_y_continuous(name= expression("NeuN+ cell ratio Ipsilateral/Contralateral")) +
+  scale_x_discrete(name="Genotype",
+                     breaks=c("Klf4+/+", "Klf4-/-"),
+                     labels=c("KLF4+/+", "KLF4-/-")) +
+  Plot_theme
+
+NeuN_Ratio_box
+```
+
+## Statistical modeling
+
+We use `brms` [@burkner2018; @brms] to fit a statistical model for the genotype factor using a student-T distribution. We fit the following model:
+
+-   **NeuN_Ratio_Fit1:** We fit a student family model to explore the relationship between the cell ratio and Genotype. The model takes the following notation:
+
+$$
+Ratio_i = \beta_0 + \beta_1 \times Genotype_i + \epsilon_i
+$$
+
+Where: $\beta_0$ is the intercept—baseline value for KLF4+/+; $\beta_1$ is the effect size of KLF4-/- on the NeuN cell ratio; and $\epsilon_i$ is the error term. The model uses brms default priors.
+
+### Fit the models
+
+```{r}
+#| label: NeuN_Ratio_Modeling
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+# Model 1: Genotype as a single predictor
+NeuN_Ratio_Mdl1 <- bf(Hemis_diff ~ Genotype)
+                     
+get_prior(NeuN_Ratio_Mdl1, data = NeuN_Ratio, family = student)
+
+# Fit model 1
+NeuN_Ratio_Fit1 <- 
+  brm(
+    data    = NeuN_Ratio,
+    family  = student, 
+    formula = NeuN_Ratio_Mdl1,
+    chains  = 4,
+    cores   = 4,
+    warmup  = 2500, 
+    iter    = 5000, 
+    seed    = 8807,
+    control = list(adapt_delta = 0.99, max_treedepth = 15),
+    file    = "Models/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap_Ratio/Widefield_5x_Ipsilateral_NeuN_Fit1.rds",
+    file_refit = "never") 
+                     
+# Add loo for model comparison
+NeuN_Ratio_Fit1 <- 
+  add_criterion(NeuN_Ratio_Fit1, c("loo", "waic", "bayes_R2"))
+
+```
+## Model diagnostics
+
+We check the model fitting using posterior predictive checks:
+
+```{r}
+#| label: fig-NeuN_Ratio_Diagnostics
+#| include: true
+#| warning: false
+#| message: false
+#| cache: true
+#| fig-cap: Model dianostics using pp_checks
+#| fig-height: 5
+#| fig-width: 5
+ 
+set.seed(8807)
+
+NeuN_Ratio_Fit1_pp <- 
+  brms::pp_check(NeuN_Ratio_Fit1, 
+                 ndraws = 100) +
+  labs(title = "Posterior predictive checks",
+  subtitle = "Formula: Ratio ~ Genotype") +
+  Plot_theme  
+  
+NeuN_Ratio_Fit1_pp
+```
+
+We observe no major deviations from the data. We can explore further the model using `shinystan`.
+
+```{r}
+#| label: NeuN_Ratio_Shiny
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+#launch_shinystan(NeuN_Ratio_Fit1)
+```
+
+## Model results
+
+### Visualization of conditional effects
+
+```{r}
+#| label: fig-NeuN_Ratio_CE 
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Conditional effects for NeuN ratio
+#| fig-height: 5
+#| fig-width: 5
+
+set.seed(8807)
+
+# We plot the contrast between WT and KO
+
+NeuN_Ratio_Contrast <- NeuN_Ratio_Fit1 %>%
+   spread_draws(b_GenotypeKlf4PDP) %>%
+   mutate(Genotype_contrast = b_GenotypeKlf4PDP) %>%
+   ggplot(aes(x = Genotype_contrast, fill = after_stat(abs(x) < 0.18))) +
+   stat_halfeye() +
+  geom_vline(xintercept = c(-0.18, 0.18), linetype = "dashed") +
+  scale_fill_manual(
+    name="ROPE", 
+    values = c("gray80", "skyblue"),
+    labels = c("False", "True")) +
+  scale_y_continuous(name = "Probability density") +
+  scale_x_continuous(name = "Contrast \n (KLF4+/+ — KLF4-/-)",
+                     limits = c(-0.4, 0.5),
+                      breaks = seq(-0.4, 0.5, 0.2) ) +
+
+  Plot_theme +
+  theme (legend.position = c(0.8, 0.8))
+
+ggsave(
+  plot     = NeuN_Ratio_Contrast, 
+  filename = "Plots/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap/Widefield_5x_Whole_EarlyKO_NeuN_Ratio.png", 
+  width    = 8, 
+  height   = 8, 
+  units    = "cm")
+
+NeuN_Ratio_Contrast 
+```
+
+@fig-NeuN_Ratio_CE shows that early depletion of KLF4 in PDGFR-β+ cells does not have any impact in the magnitude of brain damage measured by the number of NeuN+ cells.
+
+### Posterior summary
+
+Next, we plot the posterior summary using the `describe_posterior` function. We to this specifically for our 14 DPI animals. 
+
+```{r}
+#| label: NeuN_Ratio_Posterior
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+describe_posterior(
+  NeuN_Ratio_Fit1,
+  effects = "all",
+  test = c("p_direction", "rope"),
+  component = "all",
+  centrality = "median")
+
+modelsummary(NeuN_Ratio_Fit1, 
+             shape = term ~ model + statistic,
+             centrality = "mean", 
+             title = "NeuN+ cell ratio in PDGFR-β-KLF4-KO mice",
+             statistic = "conf.int",
+             gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
+             output = "Tables/html/Widefield_5x_Whole_EarlyKO_NeuN_Ratio_Table.html",
+             )
+
+NeuN_Ratio_Fit1_Table <- modelsummary(NeuN_Ratio_Fit1, 
+             shape = term ~ model + statistic,
+             centrality = "mean", 
+             statistic = "conf.int",
+             gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
+             output = "gt")
+gt::gtsave (NeuN_Ratio_Fit1_Table, 
+            filename = "Tables/tex/Widefield_5x_Whole_EarlyKO_NeuN_Ratio_Table.tex")
+```
+# Analysis for Gfap
+
+We start analyzing the ratio of Gfap+ cells.
+
+## Load and prepare the data set
+
+We load the `Widefield_5x_Whole_EarlyKO_Gfap.csv` dataset for Gfap
+
+```{r}
+#| label: tbl-Gfap_Table
+#| include: true
+#| warning: false
+#| message: false
+#| tbl-cap: "Dataset for Gfap+ cells ratio"
+
+Gfap_Ratio <- read.csv("Data_Processed/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap/Widefield_5x_Whole_EarlyKO_Gfap.csv")
+
+gt::gt(Gfap_Ratio[1:10,])
+```
+
+Now, we transform the table to a long format
+
+```{r}
+#| label: Gfap_LongTable
+#| include: true
+#| warning: false
+#| message: false
+
+Gfap_Regions_Long <- subset(Gfap_Ratio, select = -c(Hemis_diff, X))
+  
+Gfap_Regions_Long <-  melt(Gfap_Regions_Long, id.vars = c("MouseId", "Condition", "Genotype"))
+
+names(Gfap_Regions_Long)[names(Gfap_Regions_Long) == 'variable'] <- 'Region'
+names(Gfap_Regions_Long)[names(Gfap_Regions_Long) == 'value'] <- 'Ratio'
+
+Gfap_Regions_Long$Genotype <- factor(Gfap_Regions_Long$Genotype, levels = c("Klf4+/+", "Klf4-/-")) 
+```
+
+
+## Exploratory data visualization
+
+We'll begin by visualizing the ratio per brain region. 
+
+```{r}
+#| label: fig-Gfap_Regions_EDA
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Exploratory data visualization for Gfap ratio in different regions 
+#| fig-height: 5
+#| fig-width: 8
+
+
+### Ridges plot
+
+Gfap_Regions_Ridges <- 
+  ggplot(Gfap_Regions_Long, 
+         aes(x = Ratio, 
+             y = Region, 
+             fill = Genotype,
+             color = Genotype)) +
+  
+  geom_density_ridges(
+    jittered_points = TRUE, 
+    position = "raincloud",
+    rel_min_height = 0.01,
+    alpha = 0.5, scale = 0.9
+  ) +
+  
+  scale_y_discrete(
+    name= " Brain Region",
+    labels = c("Cortex", "Nuclei", "Interebrain", "Midbrain", "Fibers")) +
+  
+  scale_x_continuous(
+    name="Gfap+ cells ratio (Ipsilateral / Contralateral) ",
+    limits=c(0, 15), 
+    breaks=seq(0,15,3)) +
+  
+  scale_fill_manual(
+    values= c("#27AE60", "#E74C3C"),
+    name="Genotype",
+    breaks=c("Klf4+/+", "Klf4-/-"),
+    labels=c("KLF4+/+", "KLF4-/-")) +
+  
+   scale_color_manual(
+     values= c("#27AE60", "#E74C3C"),
+     name="Genotype",
+     breaks=c("Klf4+/+", "Klf4-/-"),
+     labels=c("KLF4+/+", "KLF4-/-")) +
+ 
+  Plot_theme
+
+Gfap_Regions_Ridges 
+```
+@fig-Gfap_Regions_EDA shows that it seems that depletion of KLF4 has a moderate effect for the number of GFAP+ cells, specially in the cortex. Now, we perform the same visualization for the whole brain.
+
+```{r}
+#| label: fig-Gfap_Brain_EDA
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Exploratory data visualization for brain shrinkage 
+#| fig-height: 5
+#| fig-width: 5
+
+set.seed(8807)
+
+Gfap_Ratio_box <- 
+  ggplot(Gfap_Ratio, 
+         aes(x = Genotype, 
+             y = Hemis_diff, 
+             color = Genotype)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(width = 0.2) +
+  scale_y_continuous(name= expression("Gfap+ cell ratio Ipsilateral/Contralateral")) +
+  scale_x_discrete(name="Genotype",
+                     breaks=c("Klf4+/+", "Klf4-/-"),
+                     labels=c("KLF4+/+", "KLF4-/-")) +
+  Plot_theme
+
+Gfap_Ratio_box
+```
+
+Here, we see that there is not a visible difference between both genotypes when the whole brain is taked into account. 
+
+
+## Statistical modeling
+
+We use `brms` [@burkner2018; @brms] to fit two statistical models using a student-T distribution. We fit the following models:
+
+-   **Gfap_Ratio_Fit1:** We fit a student family model to explore the relationship between the cell ratio and Genotype. The model takes the following notation:
+
+$$
+Ratio_i = \beta_0 + \beta_1 \times Genotype_i + \epsilon_i
+$$
+
+Where: $\beta_0$ is the intercept—baseline value for KLF4+/+; $\beta_1$ is the effect size of KLF4-/- on the Gfap cell ratio; and $\epsilon_i$ is the error term. 
+
+-   **Gfap_Ratio_Fit2:** In this model, we include the interaction between brain region and Genotype:
+
+$$
+Ratio_i = \beta_0 + \beta_1 \times Genotype_i * Region_i+ \epsilon_i
+$$
+Both models take the default brms priors.
+
+### Fit the models
+
+```{r}
+#| label: Gfap_Ratio_Modeling
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+# Model 1: Genotype as a single predictor
+Gfap_Ratio_Mdl1 <- bf(Hemis_diff ~ Genotype)
+                     
+get_prior(Gfap_Ratio_Mdl1, data = Gfap_Ratio, family = lognormal)
+
+# Fit model 1
+Gfap_Ratio_Fit1 <- 
+  brm(
+    data    = Gfap_Ratio,
+    family  = lognormal(), 
+    formula = Gfap_Ratio_Mdl1,
+    chains  = 4,
+    cores   = 4,
+    warmup  = 2500, 
+    iter    = 5000, 
+    seed    = 8807,
+    control = list(adapt_delta = 0.99, max_treedepth = 15),
+    file    = "Models/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap_Ratio/Widefield_5x_Ipsilateral_Gfap_Fit1.rds",
+    file_refit = "never") 
+                     
+# Add loo for model comparison
+Gfap_Ratio_Fit1 <- 
+  add_criterion(Gfap_Ratio_Fit1, c("loo", "waic", "bayes_R2"))
+
+
+# Model 1: Genotype as a single predictor
+Gfap_Ratio_Mdl2 <- bf(Ratio ~ Genotype * Region)
+                     
+get_prior(Gfap_Ratio_Mdl2, data = Gfap_Regions_Long, family = lognormal)
+
+# Fit model 2
+Gfap_Ratio_Fit2 <- 
+  brm(
+    data    = Gfap_Regions_Long,
+    family  = lognormal, 
+    formula = Gfap_Ratio_Mdl2,
+    chains  = 4,
+    cores   = 4,
+    warmup  = 2500, 
+    iter    = 5000, 
+    seed    = 8807,
+    control = list(adapt_delta = 0.99, max_treedepth = 15),
+    file    = "Models/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap_Ratio/Widefield_5x_Ipsilateral_Gfap_Fit2.rds",
+    file_refit = "never") 
+                     
+# Add loo for model comparison
+Gfap_Ratio_Fit2 <- 
+  add_criterion(Gfap_Ratio_Fit2, c("loo", "waic", "bayes_R2"))
+
+```
+## Model diagnostics
+
+We check the model fitting using posterior predictive checks:
+
+```{r}
+#| label: fig-Gfap_Ratio_Diagnostics
+#| include: true
+#| warning: false
+#| message: false
+#| cache: true
+#| fig-cap: Model dianostics using pp_checks
+#| fig-height: 5
+#| fig-width: 10
+ 
+set.seed(8807)
+
+Gfap_Ratio_Fit1_pp <- 
+  brms::pp_check(Gfap_Ratio_Fit1, 
+                 ndraws = 100) +
+  scale_x_continuous(limits = c(-10, 10)) +
+  labs(title = "Posterior predictive checks",
+  subtitle = "Formula: Ratio ~ Genotype") +
+  Plot_theme  
+  
+
+Gfap_Ratio_Fit2_pp <- 
+  brms::pp_check(Gfap_Ratio_Fit2, 
+                 ndraws = 100) +
+  scale_x_continuous(limits = c(-20, 20)) +
+  labs(title = "Posterior predictive checks",
+  subtitle = "Formula: Ratio ~ Genotype * Regions") +
+  Plot_theme  
+  
+Gfap_Ratio_Fit1_pp | Gfap_Ratio_Fit2_pp
+```
+
+We observe no major deviations from the data. We can explore further the model using `shinystan`.
+
+```{r}
+#| label: Gfap_Ratio_Shiny
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+#launch_shinystan(Gfap_Ratio_Fit1)
+```
+
+## Model results
+
+### Visualization of conditional effects
+
+```{r}
+#| label: fig-Gfap_Ratio_CE 
+#| include: true
+#| warning: false
+#| message: false
+#| fig-cap: Conditional effects for Gfap ratio
+#| fig-height: 5
+#| fig-width: 5
+
+set.seed(8807)
+
+# We plot the contrast between WT and KO
+
+Gfap_Ratio_Contrast <- Gfap_Ratio_Fit1 %>%
+   spread_draws(b_GenotypeKlf4PDP) %>%
+   mutate(Genotype_contrast = b_GenotypeKlf4PDP) %>%
+   ggplot(aes(x = Genotype_contrast, fill = after_stat(abs(x) < 0.39))) +
+   stat_halfeye() +
+  geom_vline(xintercept = c(-0.39, 0.39), linetype = "dashed") +
+  scale_fill_manual(
+    name="ROPE", 
+    values = c("gray80", "skyblue"),
+    labels = c("False", "True")) +
+  scale_y_continuous(name = "Probability density") +
+  scale_x_continuous(name = "Contrast \n (KLF4+/+ — KLF4-/-)",
+                     limits = c(-0.4, 0.5),
+                      breaks = seq(-0.4, 0.5, 0.2) ) +
+
+  Plot_theme +
+  theme (legend.position = c(0.8, 0.8))
+
+ggsave(
+  plot     = Gfap_Ratio_Contrast, 
+  filename = "Plots/Widefield_5x_Whole_EarlyKO_Pdgfrb-NeuN-Gfap/Widefield_5x_Whole_EarlyKO_Gfap_Ratio.png", 
+  width    = 8, 
+  height   = 8, 
+  units    = "cm")
+
+Gfap_Ratio_Contrast 
+```
+
+@fig-Gfap_Ratio_CE shows that early depletion of KLF4 in PDGFR-β+ cells does not have any impact in the magnitude of brain damage measured by the number of Gfap+ cells.
+
+### Posterior summary
+
+Next, we plot the posterior summary using the `describe_posterior` function. We to this specifically for our 14 DPI animals. 
+
+```{r}
+#| label: Gfap_Ratio_Posterior
+#| include: true
+#| warning: false
+#| message: false
+#| results: false
+#| cache: true
+
+describe_posterior(
+  Gfap_Ratio_Fit1,
+  effects = "all",
+  test = c("p_direction", "rope"),
+  component = "all",
+  centrality = "median")
+
+modelsummary(Gfap_Ratio_Fit1, 
+             shape = term ~ model + statistic,
+             centrality = "mean", 
+             title = "Gfap+ cell ratio in PDGFR-β-KLF4-KO mice",
+             statistic = "conf.int",
+             gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
+             output = "Tables/html/Widefield_5x_Whole_EarlyKO_Gfap_Ratio_Table.html",
+             )
+
+Gfap_Ratio_Fit1_Table <- modelsummary(Gfap_Ratio_Fit1, 
+             shape = term ~ model + statistic,
+             centrality = "mean", 
+             statistic = "conf.int",
+             gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
+             output = "gt")
+gt::gtsave (Gfap_Ratio_Fit1_Table, 
+            filename = "Tables/tex/Widefield_5x_Whole_EarlyKO_Gfap_Ratio_Table.tex")
+```
+
+
+# References
+
+::: {#refs}
+:::
+
+```{r}
+sessionInfo()
+```

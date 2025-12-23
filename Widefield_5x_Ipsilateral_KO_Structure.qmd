@@ -51,7 +51,7 @@ bibliography: references.bib
 
 In this notebook, we perform the analysis of the structural changes in KLF4 brain and related glial/fibrotic scar markers in the ipsilateral hemisphere following cerebral ischemia.
 
-**Parent dataset:** PDGFRβ and GFAP stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped as KO (PDGFRβ/KLF4KO) and WT (Wild type controls). The mice were sacrificed 14 days post-ischemia (DPI) and four WT brains with no ischemia were added as a base control for measurement errors. The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_KO:Pdgfrb-NeuN-Gfap.zip`. Please note that the NeuN channel was not analyzed in the current notebook. 
+**Parent dataset:** PDGFRβ and GFAP stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped as KO (PDGFRβ/KLF4KO) and WT (Wild type controls). The mice were sacrificed 14 days post-ischemia (DPI) and four WT brains with no ischemia were added as a base control for measurement errors. The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap.zip`. Please note that the NeuN channel was not analyzed in the current notebook. 
 
 **Working dataset**: This notebook uses two datasets. First, the `Data_Processed/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap/Widefield_5x_Ipsilateral_Shrinkage.csv` file containing measurements of the ipsilateral and contralateral hemispheres performed by the researchers in FIJI. Second, the `Data_Raw/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap/Image.csv`data frame contains the measurements for area and intensity conducted on CellProfiler [@stirling2021]. We performed pixel classification in Ilastik [@berg2019] for PDGFRβ (https://osf.io/yqwuj) and GFAP (https://osf.io/hytpc). The CellProfiler pipeline is also available at (https://osf.io/ks5yg).
 
@@ -183,7 +183,7 @@ Structure <- cbind (Area_Intensity, Shrinkage$Ratio, Shrinkage$Ipsilateral)
 colnames(Structure)[10] <- "Shrinkage"
 colnames(Structure)[11] <- "Ipsilateral"
 
-write.csv(Structure, "Data_Processed/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap/Widefield_5x_Ipsilateral_Structure.csv", row.names = FALSE)
+write.csv(Structure, "Data_Processed/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap/Widefield_5x_Ipsilateral_KO_Structure.csv", row.names = FALSE)
 
 gt::gt(Structure[1:10,])
 ```
@@ -296,7 +296,7 @@ Shrinkage_0D <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Shrinkage_0D.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Shrinkage_0D.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -329,7 +329,7 @@ Shrinkage_Fit1 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Shrinkage_Fit1.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Shrinkage_Fit1.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -355,7 +355,7 @@ Shrinkage_Fit2 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Shrinkage_Fit2.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Shrinkage_Fit2.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -440,7 +440,7 @@ Shrinkage_0D_fig <- Shrinkage_0D %>%
 
 ggsave(
   plot     = Shrinkage_0D_fig, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Shrinkage_0D.png", 
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Shrinkage_0D.png", 
   width    = 7, 
   height   = 7, 
   units    = "cm")
@@ -461,18 +461,19 @@ Shrinkage_Contrast <- Shrinkage_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-0.2, 0.4),
                       breaks = seq(-0.2, 0.4, 0.2) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = Shrinkage_Contrast, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Shrinkage_Fit1.png", 
-  width    = 7, 
-  height   = 7, 
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Shrinkage_Fit1.png", 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 Shrinkage_0D_fig | Shrinkage_Contrast 
@@ -563,7 +564,7 @@ Pdgfrb_Fit1 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb_Fit1.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb_Fit1.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -588,7 +589,7 @@ Gfap_Fit1 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Gfap_Fit1.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Gfap_Fit1.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -655,18 +656,19 @@ Pdgfrb_Contrast <- Pdgfrb_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-400, 250),
                       breaks = seq(-400, 200, 200) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = Pdgfrb_Contrast, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit1.png", 
-  width    = 7, 
-  height   = 7, 
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit1.png", 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 Pdgfrb_Contrast 
@@ -683,18 +685,19 @@ Gfap_Contrast <- Gfap_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-200, 500),
                       breaks = seq(-200, 500, 200) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = Gfap_Contrast, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Gfap_Fit1.png", 
-  width    = 7, 
-  height   = 7, 
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Gfap_Fit1.png", 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 Gfap_Contrast 
@@ -809,7 +812,7 @@ Pdgfrb_Fit2 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb_Fit2.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb_Fit2.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -834,7 +837,7 @@ Pdgfrb_Fit3 <-
     iter    = 5000, 
     seed    = 8807,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb_Fit3.rds",
+    file    = "Models/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb_Fit3.rds",
     file_refit = "never") 
                      
 # Add loo for model comparison
@@ -907,10 +910,10 @@ Pdgfrb_Fit2_fig <- Pdgfrb_Fit2_CE +
   
   scale_color_manual(name = "",
                        values = c("#4DB6D0", "#D9717D"),
-                       labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+                       labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
  scale_fill_manual(name = "",
                      values = c("#4DB6D0", "#D9717D"),
-   labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+   labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
   
   Plot_theme +
   theme(
@@ -921,7 +924,7 @@ Pdgfrb_Fit2_fig <- Pdgfrb_Fit2_CE +
 
   ggsave(
   plot     = Pdgfrb_Fit2_fig, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit2.png",  
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit2.png",  
   width    = 9, 
   height   = 9, 
   units    = "cm")
@@ -941,11 +944,12 @@ Pdgfrb_Fit3_fig <- Pdgfrb_Fit3_CE +
                      
   scale_color_manual(name = "",
                        values = c("#4DB6D0", "#D9717D"),
-                       labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+                       labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
  scale_fill_manual(name = "",
                      values = c("#4DB6D0", "#D9717D"),
-   labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+   labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
   
+
   Plot_theme +
   theme(
   legend.position = "top", 
@@ -955,7 +959,7 @@ Pdgfrb_Fit3_fig <- Pdgfrb_Fit3_CE +
 
   ggsave(
   plot     = Pdgfrb_Fit3_fig, 
-  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit3.png",  
+  filename = "Plots/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Structure/Widefield_5x_Ipsilateral_KO_Pdgfrb-NeuN-Gfap_Pdgfrb_Fit3.png",  
   width    = 9, 
   height   = 9, 
   units    = "cm")

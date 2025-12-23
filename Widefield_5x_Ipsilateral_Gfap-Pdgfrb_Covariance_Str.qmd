@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "Point pattern analysis (PPA) of PDGFR-β and GFAP - Striatal lesions"
+title: "Point pattern analysis (PPA) of PDGFRβ and GFAP - Striatal lesions"
 subtitle: "Data analysis notebook"
 date: today
 date-format: full
@@ -50,11 +50,11 @@ editor:
 
 # Preview
 
-In this notebook we analyse point patterns generated from PDGFR-β and GFAP cells in brains with striatal injures. We performed automatic cell detection and classification using QuPath [@bankhead2017], and created point patterns the R-package `spatstat`[@baddeley2005; @spatstat]. The point patterns were saved as `.rds` object files.
+In this notebook we analyse point patterns generated from PDGFRβ and GFAP cells in brains with striatal injures. We performed automatic cell detection and classification using QuPath [@bankhead2017], and created point patterns the R-package `spatstat`[@baddeley2005; @spatstat]. The point patterns were saved as `.rds` object files.
 
-**Parent dataset:** PDGFR-β and GFAP-stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped at 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_Gfap-Pdgfrb.zip`. Individual cells were detected and classified into PDGFR-β^low^ (Pdgfrb_Neg) and PDGFR-β^high^ (Pdgfrb_Pos) using QuPath [@bankhead2017].The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/ty4z5.
+**Parent dataset:** PDGFRβ and GFAP-stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped at 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_Gfap-Pdgfrb.zip`. Individual cells were detected and classified into PDGFRβ^low^ (Pdgfrb_Neg) and PDGFRβ^high^ (Pdgfrb_Pos) using QuPath [@bankhead2017].The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/ty4z5.
 
-**Working dataset:** PDGFR-β and GFAP point patterns derived from the ischemic hemispheres of animals with striatal injury and saved as a hyperframe .rds R-object.
+**Working dataset:** PDGFRβ and GFAP point patterns derived from the ischemic hemispheres of animals with striatal injury and saved as a hyperframe .rds R-object.
 
 # Install and load required packages
 
@@ -112,7 +112,7 @@ Plot_theme <- theme_classic() +
 
 # Load the dataset
 
-In this notebook we analyze the covariance between PDGFR-β and GFAP cells in brain with striatal injury using function from the `spatstat` package [@spatstat; @baddeley2005]. First, we load the point patterns:
+In this notebook we analyze the covariance between PDGFRβ and GFAP cells in brain with striatal injury using function from the `spatstat` package [@spatstat; @baddeley2005]. First, we load the point patterns:
 
 ```{r}
 #| label: PPP_Pdgfrb_Load 
@@ -135,9 +135,9 @@ The hyperframe contain the following columns:
 
 -   **"blank" (RowID):** This is a column with no name which contains the rows IDs, labeled as the unique animal ID.
 
--   **Pdgfr_High:** Point patterns for PDGFR-β_high (reactive) cells.
+-   **Pdgfr_High:** Point patterns for PDGFRβ_high (reactive) cells.
 
--   **Pdgfr_Low:** Point patterns for PDGFR-β_low (non-reactive) cells.
+-   **Pdgfr_Low:** Point patterns for PDGFRβ_low (non-reactive) cells.
 
 -   **Gfap:** Point patterns for GFAP+ cells.
 
@@ -166,13 +166,13 @@ PointPatterns_Str$Gfap_Density <- with (PointPatterns_Str, density(Gfap, sigma =
 
 # Plot density kernels
 
-We use the default R plotting functions to visualize examples of the generated density kernels for PDGFR-β^low^ and PDGFR-β^high^.
+We use the default R plotting functions to visualize examples of the generated density kernels for PDGFRβ^low^ and PDGFRβ^high^.
 ```{r}
 #| label: PPP_PDGFR_DensityPlots
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Example density kernels for PDGFR-β^low^ and PDGFR-β^high^
+#| fig-cap: Example density kernels for PDGFRβ^low^ and PDGFRβ^high^
 #| fig-height: 5
 #| fig-width: 9
 
@@ -192,11 +192,11 @@ plot(PointPatterns_Str$Pdgfrb_High_Density$Td94, col = Pdgfrb_High_Colmap, main 
 plot(PointPatterns_Str$Pdgfrb_High_Density$Td102, col = Pdgfrb_High_Colmap, main = "")  
 ```
 
-We can appreciate that the response of reactive PDGFR-β cells is highly reduced in striatal lesions compared to cortico-striatal lesions.
+We can appreciate that the response of reactive PDGFRβ cells is highly reduced in striatal lesions compared to cortico-striatal lesions.
 
-# Calculate relative distribution of PDGFR-β cells to astrocytes
+# Calculate relative distribution of PDGFRβ cells to astrocytes
 
-To calculate the relative distribution between PDGFR-β^high^/PDGFR-β^low^ and GFAP, we subset the hyperframe per DPI, given the limited functionality of the `rhohat` function in `spatstat`.
+To calculate the relative distribution between PDGFRβ^high^/PDGFRβ^low^ and GFAP, we subset the hyperframe per DPI, given the limited functionality of the `rhohat` function in `spatstat`.
 
 ```{r}
 #| label: PPP_Pdgfrb_DensityPlots
@@ -212,7 +212,7 @@ PointPatterns_Str_14D <- subset(PointPatterns_Str, DPI=="14D", select = 1:9)
 PointPatterns_Str_30D <- subset(PointPatterns_Str, DPI=="30D", select = 1:9)
 ```
 
-Next, we calculate the relative distribution of PDGFR-β^high^ cells to astrocytes using the `rhohat` function from `spatstat`. We explicitly utilize `do.CI = FALSE` to further pool the individual calculations. Also, we exclude SHAM animals from this estimation.
+Next, we calculate the relative distribution of PDGFRβ^high^ cells to astrocytes using the `rhohat` function from `spatstat`. We explicitly utilize `do.CI = FALSE` to further pool the individual calculations. Also, we exclude SHAM animals from this estimation.
 
 ```{r}
 #| label: PPP_Pdgfr_RhohatAstrocytes
@@ -259,7 +259,7 @@ axis(1, at = seq(0, 500, 100), labels = c("0", "100", "200", "300", "400", "500"
 axis(2, at = seq(0, 80, 20), labels = c("0", "20", "40", "60", "80"), cex.axis=2.5, padj = 0.5, lwd.ticks = 5, las = 2)
 
 title(xlab = "GFAP (intensity)", mgp = c(4.5, 2, 0), cex.lab = 3)   
-title(ylab = expression("(p)PDGFR-β"^high), mgp = c(5, 1, 0), cex.lab = 3) 
+title(ylab = expression("(p)PDGFRβ"^high), mgp = c(5, 1, 0), cex.lab = 3) 
 
 dev.off()
 
@@ -284,7 +284,7 @@ axis(1, at = seq(0, 400, 100), labels = c("0", "100", "200", "300", "400"), cex.
 axis(2, at = seq(0, 120, 30), labels = c("0", "30", "60", "90", "120"), cex.axis=2.5, padj = 0.5, lwd.ticks = 5, las = 2)
 
 title(xlab = "GFAP (intensity)", mgp = c(4.5, 2, 0), cex.lab = 3)   
-title(ylab = expression("(p)PDGFR-β"^high), mgp = c(5, 1, 0), cex.lab = 3) 
+title(ylab = expression("(p)PDGFRβ"^high), mgp = c(5, 1, 0), cex.lab = 3) 
 
 dev.off()
 ```
@@ -310,7 +310,7 @@ Pdgfrb_Mdl1 <- mppm(Pdgfrb_High ~ DPI/Gfap_Density, data = PointPatterns_Str)
 Pdgfrb_Mdl1_Coeff <- coef (Pdgfrb_Mdl1)
 ```
 
-The model shows (on the log scale) that the intensity of the dot pattern increases at 7 (2.014) and 14 (2.494) DPI compared to 3 DPI, controlling for GFAP density. The difference is smaller at 30 DPI (1.49). In addition, the interaction terms show a negative trend (-0.0016) in PDGFR-β^high^ spatial intensity for each unit increase in GFAP density at 3 DPI. This negative trend continues at 7 (-0.0017) and 14 (-0.00066) DPI until it is reversed at 30 DPI (0.0017). The data at 14 and 30 DPI show a progressive mixing of the cell populations.
+The model shows (on the log scale) that the intensity of the dot pattern increases at 7 (2.014) and 14 (2.494) DPI compared to 3 DPI, controlling for GFAP density. The difference is smaller at 30 DPI (1.49). In addition, the interaction terms show a negative trend (-0.0016) in PDGFRβ^high^ spatial intensity for each unit increase in GFAP density at 3 DPI. This negative trend continues at 7 (-0.0017) and 14 (-0.00066) DPI until it is reversed at 30 DPI (0.0017). The data at 14 and 30 DPI show a progressive mixing of the cell populations.
 
 
 # References

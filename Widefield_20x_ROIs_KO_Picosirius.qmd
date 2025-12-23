@@ -386,9 +386,9 @@ Pico_Area_CE_Fig <-
                    labels = c("Striatum", "Cortex")) +
   scale_y_continuous(name = "Picosirius stained area") +
   scale_color_manual(values = rev(cols),
-                     labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+                     labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
   scale_fill_manual(values = rev(cols),
-                     labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+                     labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
   
   theme_classic() +
   Plot_theme +

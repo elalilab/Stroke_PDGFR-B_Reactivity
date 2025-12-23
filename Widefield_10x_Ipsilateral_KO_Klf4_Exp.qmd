@@ -633,18 +633,19 @@ Klf4KO_Int_Contrast <- Klf4KO_Int_Fit2 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-2000, 3000),
                       breaks = seq(-2000, 3000, 2000) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
-
+  theme (axis.title.x = element_text(size = 14), 
+        legend.position = c(0.8, 0.8)) 
+  
 ggsave(
   plot     = Klf4KO_Int_Contrast , 
   filename = "Plots/Widefield_10x_Ipsilateral_KO_Klf4_Exp/Widefield_10x_Ipsilateral_KO_Klf4_Intensity.png", 
-  width    = 7, 
-  height   = 7, 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 Klf4KO_Int_Contrast 
@@ -670,16 +671,17 @@ Klf4KO_Sigma_Contrast <- Klf4KO_Int_Fit2 %>%
   ggplot(aes(x = Sigma_contrast)) +
    stat_halfeye() +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Sigma (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-3, 2),
                       breaks = seq(-3, 2, 1) ) +
-  Plot_theme
+  Plot_theme +
+  theme (axis.title.x = element_text(size = 14))
 
 ggsave(
   plot     = Klf4KO_Sigma_Contrast, 
   filename = "Plots/Widefield_10x_Ipsilateral_KO_Klf4_Exp/Widefield_10x_Ipsilateral_KO_Klf4_Sigma.png", 
-  width    = 7, 
-  height   = 7, 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 Klf4KO_Sigma_Contrast 

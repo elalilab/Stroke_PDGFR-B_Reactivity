@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "FACS analysis of PDGFR-β+ live/deat cells"
+title: "FACS analysis of PDGFRβ+ live/deat cells"
 subtitle: "FACS processing notebook"
 date: today
 date-format: full
@@ -15,7 +15,7 @@ author:
         group: Laboratory of neurovascular interactions 
 note: "GitHub: https://daniel-manrique.github.io/"
 keywords: 
-  - PDGFR-β
+  - PDGFRβ
   - FACS
   - Brain injury
   - Bayesian modeling 
@@ -47,11 +47,11 @@ editor:
 
 # Preview
 
-In this notebook, we do the FACS analysis of PDGFR-β+ cells sorted from
+In this notebook, we do the FACS analysis of PDGFRβ+ cells sorted from
 the ipsilateral and contralateral hemispheres of ischemic
-PDGFR-β-TdTomato mice. Rere to [this](https://github.com/elalilab/Stroke_PDGFR-B_Reactivity/blob/main/FlowCytometry_Pdgfrb_Processing.qmd) notebook to see .fcs files processing. 
+PDGFRβ-TdTomato mice. Rere to [this](https://github.com/elalilab/Stroke_PDGFRβ_Reactivity/blob/main/FlowCytometry_Pdgfrb_Processing.qmd) notebook to see .fcs files processing. 
 
-**Parent dataset:** We sorted PDGFR-β+ from ischemic PDGFR-β-TdTomato
+**Parent dataset:** We sorted PDGFRβ+ from ischemic PDGFRβ-TdTomato
 animals at 14 DPI. We took coronal \~2 mm-tick sections of the
 ipsilateral hemisphere comprising the injured areas exclusively. We took
 analogous tissue from the contralateral hemisphere as a baseline control
@@ -59,7 +59,7 @@ for the mortality of cells.The raw FACS files (including compensation
 controls) are available at the OSF repository in
 ['Datasets/FACS'](https://osf.io/zvnxa/).
 
-**Working dataset:** We use the `Data_Processed/Facs_Pdgfrb/Fcas_Pdgfrb_Cells-Dead.csv` file generated after processing the .fcs files. We perform scientific inference based on the percentage of PDGFR-β+ cells and Death PDGFR-β+ dead cells.
+**Working dataset:** We use the `Data_Processed/Facs_Pdgfrb/Fcas_Pdgfrb_Cells-Dead.csv` file generated after processing the .fcs files. We perform scientific inference based on the percentage of PDGFRβ+ cells and Death PDGFRβ+ dead cells.
 
 # Load the required packages
 
@@ -116,7 +116,7 @@ Plot_theme <- theme_classic() +
       ) 
 ```
 
-# Analysis of the percentaje of PDGFR-β+ cells
+# Analysis of the percentaje of PDGFRβ+ cells
 
 
 ## Exploratory data visualization
@@ -127,7 +127,7 @@ Plot_theme <- theme_classic() +
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Exploratory data visualization for the number of PDGFR-β+ cells
+#| fig-cap: Exploratory data visualization for the number of PDGFRβ+ cells
 #| fig-width: 5
 #| fig-height: 4
 
@@ -142,7 +142,7 @@ Pdgfrb_Cells <-
     aes(x = Hemisphere, 
         y = Cells)) +
   geom_boxplot() +
-  scale_y_continuous(name= expression("Percentage of PDGFR-β+ cells")) +
+  scale_y_continuous(name= expression("Percentage of PDGFRβ+ cells")) +
   scale_x_discrete(name="Hemisphere",
                      breaks=c("Contra","Ipsi")) +
   Plot_theme 
@@ -150,7 +150,7 @@ Pdgfrb_Cells <-
 Pdgfrb_Cells
 ```
 
-As expected, we witness that th ipsilateral hemisphere registers the double of PDGFR-β+ cells.
+As expected, we witness that th ipsilateral hemisphere registers the double of PDGFRβ+ cells.
 
 ## Statistical modeling
 
@@ -239,7 +239,7 @@ We observe no significant deviations from the data. We can explore further the m
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Posterior distribution for the percentage of PDGFR-β+ cells
+#| fig-cap: Posterior distribution for the percentage of PDGFRβ+ cells
 #| fig-height: 4
 #| fig-width: 5
 
@@ -273,7 +273,7 @@ ggsave(
 Pdgfrb_Percentage_Contrast
 ```
 
-@fig-Pdgfrb_Percentage_CE show that the ipsilateral hemisphere (as expected) has more (the double) of PDGFR-β+ cells at 14 DPI.
+@fig-Pdgfrb_Percentage_CE show that the ipsilateral hemisphere (as expected) has more (the double) of PDGFRβ+ cells at 14 DPI.
 
 ### Posterior summary
 
@@ -297,7 +297,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Percentage_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "PErcentage of PDGFR-β+ cells following MCAO",
+             title = "PErcentage of PDGFRβ+ cells following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Facs_Pdgfrb_Fit1_Table.html",
@@ -312,7 +312,9 @@ Pdgfrb_Percentage_Fit1_Table <- modelsummary(Pdgfrb_Percentage_Fit1,
 gt::gtsave (Pdgfrb_Percentage_Fit1_Table, 
             filename = "Tables/tex/Facs_Pdgfrb_Fit1_Table.tex")
 ```
-# Analysis of the percentaje of PDGFR-β+ dead cells
+
+
+# Analysis of the percentaje of PDGFRβ+ dead cells
 
 ## Exploratory data visualization
 
@@ -322,7 +324,7 @@ gt::gtsave (Pdgfrb_Percentage_Fit1_Table,
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Exploratory data visualization for the number of PDGFR-β+ dead cells
+#| fig-cap: Exploratory data visualization for the number of PDGFRβ+ dead cells
 #| fig-width: 5
 #| fig-height: 4
 
@@ -337,7 +339,7 @@ Pdgfrb_Dead <-
     aes(x = Hemisphere, 
         y = Dead)) +
   geom_boxplot() +
-  scale_y_continuous(name= expression("Percentage of PDGFR-β+ dead cells")) +
+  scale_y_continuous(name= expression("Percentage of PDGFRβ+ dead cells")) +
   scale_x_discrete(name="Hemisphere",
                      breaks=c("Contra","Ipsi")) +
   Plot_theme 
@@ -345,7 +347,7 @@ Pdgfrb_Dead <-
 Pdgfrb_Dead
 ```
 
-As expected, we witness that th ipsilateral hemisphere registers the double of PDGFR-β+ cells.
+As expected, we witness that th ipsilateral hemisphere registers the double of PDGFRβ+ cells.
 
 # Statistical modeling
 
@@ -386,7 +388,7 @@ Pdgfrb_Dead_Fit1  <-
 
 
 
-# Model 1: Hemisphere as a linear predictor for dead cells and sigma
+# Model 2: Hemisphere as a linear predictor for dead cells and sigma
 Pdgfrb_Dead_Mdl2 <- bf(Dead ~ Hemisphere,
                        sigma ~ Hemisphere)
 
@@ -536,7 +538,7 @@ Pdgfrb_Dead_WAIC
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Posterior distribution for the percentage of PDGFR-β+ dead cells
+#| fig-cap: Posterior distribution for the percentage of PDGFRβ+ dead cells
 #| fig-height: 4
 #| fig-width: 5
 
@@ -570,7 +572,7 @@ ggsave(
 Pdgfrb_Dead_Contrast
 ```
 
-@fig-Pdgfrb_Dead_CE shows that the ipsilateral hemisphere (as expected) has more PDGFR-β+ dead cells at 14 DPI.
+@fig-Pdgfrb_Dead_CE shows that the ipsilateral hemisphere (as expected) has more PDGFRβ+ dead cells at 14 DPI.
 
 ## Posterior summary
 
@@ -594,7 +596,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Dead_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Percentage of PDGFR-β+ dead cells following MCAO",
+             title = "Percentage of PDGFRβ+ dead cells following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Facs_Pdgfrb_Fit1_Dead_Table.html",

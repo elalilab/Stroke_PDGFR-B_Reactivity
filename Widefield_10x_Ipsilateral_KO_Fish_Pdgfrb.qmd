@@ -327,17 +327,21 @@ Pdgfrb_Count_fig <- ggplot(Pdgfrb_Count_Draws, aes(x = Genotype, y = .prediction
   stat_halfeye() + # Visualize the posterior predictive distribution
   geom_jitter(data = Pdgfrb_Counts_14D, aes(x = Genotype, y = Counts),
               width = 0.15, alpha = 0.6, size = 2) + # Actual measurements
-  labs(x = "Genotype") + 
+  labs(x = "") + 
   scale_y_continuous(name = "Number of PDGFRβ+ cells",
                      limits = c(0, 400),
                       breaks = seq(0, 400, 100) ) +
+  scale_x_discrete(labels = c(expression('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO")),
+                   breaks = c("WT", "KO")) +
+  
   Plot_theme +
+  theme (axis.text.y = element_text(angle = 45))+
   coord_flip()
 
 ggsave(
   plot     = Pdgfrb_Count_fig, 
   filename = "Plots/Widefield_10x_ROIs_KO_Fish_Pdgfrb/Widefield_10x_ROIs_KO_Fish_Pdgfrb_Counts.png", 
-  width    = 9, 
+  width    = 12, 
   height   = 9, 
   units    = "cm")
 
@@ -712,10 +716,10 @@ Pdgfrb_AreaInt_fig <- Pdgfrb_AreaInt_DPI +
   
   scale_color_manual(name = "",
                        values = c("#4DB6D0", "#D9717D"),
-                       labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+                       labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
  scale_fill_manual(name = "",
                      values = c("#4DB6D0", "#D9717D"),
-   labels = c("Wildtype", expression ("PDGFRβ"^KLF4_KO))) +
+   labels = c(expression ('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
   
   Plot_theme +
   theme(legend.position = "top",

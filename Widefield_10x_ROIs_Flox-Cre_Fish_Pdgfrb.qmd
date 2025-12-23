@@ -49,7 +49,7 @@ bibliography: references.bib
 
 This notebook reports the analysis of PDGFR-β expression (by FISH) in KLF4-Flox and PDGFR-β-Cre mice. This is a control experiment to determine if PDGFR-β-Cre mice affects the staining intensity of PDGFR-β mRNA. Sham WT PDGFR-B td-Tomato mice were added as control.  
 
-**Parent dataset:** PDGFR-β(FISH) stained ROIs (10x magnification) in the helthy cortex. Animals are not subjected to cerebral ischemia. 
+**Parent dataset:** PDGFR-β(FISH) stained ROIs (10x magnification) in the healthy cortex. Animals are not subjected to cerebral ischemia. 
 
 **Working dataset**: The `Data_Raw/Widefield_10x_ROIs_Flox-Cre_Fish_Pdgfrb/Widefield_10x_ROIs_Flox-Cre_Fish_Pdgfrb_Objects.csv` and `Data_Raw/Widefield_10x_ROIs_Flox-Cre_Fish_Pdgfrb/Widefield_10x_ROIs_Flox-Cre_Fish_Pdgfrb_Image.csv` dataframes containing the raw output from CellProfiller [@stirling2021]. The CellProfiler pipeline is available at https://osf.io/yndua.
 
@@ -306,7 +306,7 @@ After validating the model, we plot the full posterior distributions for the pop
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Posterior distribution for the number of of PDGFR-β+ cells
+#| fig-cap: Posterior distribution for the number of of PDGFRβ+ cells
 #| fig-width: 10
 #| fig-height: 4
 
@@ -323,11 +323,13 @@ Pdgfrb_Count_fig <- ggplot(Pdgfrb_Count_Draws, aes(x = Genotype, y = .prediction
   stat_halfeye() + # Visualize the posterior predictive distribution
   geom_jitter(data = Pdgfrb_Counts, aes(x = Genotype, y = Counts),
               width = 0.15, alpha = 0.6, size = 2) + # Actual measurements
-  labs(x = "Genotype") + 
+  labs(x = "") + 
   scale_y_continuous(name = "Number of PDGFRβ+ cells",
                      limits = c(50, 250),
                       breaks = seq(50, 250, 50) ) +
-  scale_x_discrete(labels = c("KLF4-Flox/PDGFRβ-Cre", "PDGFRβ-Cre", "KLF4-Flox"))+
+  
+  scale_x_discrete(labels = c(expression("KLF4"^"Flox"~"/"~PDGFRβ^"Cre"), expression('PDGFRβ'^"Cre"), expression ('KLF4'^"Flox")))+
+
   Plot_theme +
   coord_flip()
 
@@ -657,10 +659,10 @@ Pdgfrb_AreaInt_fig <- Pdgfrb_AreaInt_DPI +
   
   scale_color_manual(name = "",
                        values = c("#4DB6D0", "#D9717D", "#28e358"),
-                       labels = c("KLF4-Flox/PDGFRβ-Cre", "PDGFRβ-Cre", "KLF4-Flox")) +
+                       labels = c(expression("KLF4"^"Flox"~"/"~PDGFRβ^"Cre"), expression('PDGFRβ'^"Cre"), expression ('KLF4'^"Flox"))) +
  scale_fill_manual(name = "",
                      values = c("#4DB6D0", "#D9717D", "#28e358"),
-   labels = c("KLF4-Flox/PDGFRβ-Cre", "PDGFRβ-Cre", "KLF4-Flox")) +
+   labels = c(expression("KLF4"^"Flox"~"/"~PDGFRβ^"Cre"), expression('PDGFRβ'^"Cre"), expression ('KLF4'^"Flox"))) +
   
   Plot_theme +
   theme(legend.position = "top",

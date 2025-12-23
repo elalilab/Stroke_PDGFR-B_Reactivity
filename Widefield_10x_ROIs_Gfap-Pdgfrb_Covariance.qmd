@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "Point pattern analysis (PPA) of PDGFR-β and GFAP+ cells (regions of interest)"
+title: "Point pattern analysis (PPA) of PDGFRβ and GFAP+ cells (regions of interest)"
 subtitle: "Data analysis notebook"
 date: today
 date-format: full
@@ -50,10 +50,10 @@ editor:
 
 # Preview
 
-In this notebook, we perform the analysis of PDGFR-β and GFAP covariance in specified ROIs in the injured cortex, striatum and perilesion. We performed automatic cell detection and classification using QuPath [@bankhead2017], and created point patterns the R-package `spatstat`[@baddeley2005; @spatstat]. The point patterns were saved as `.rds` object files.
+In this notebook, we perform the analysis of PDGFRβ and GFAP covariance in specified ROIs in the injured cortex, striatum and perilesion. We performed automatic cell detection and classification using QuPath [@bankhead2017], and created point patterns the R-package `spatstat`[@baddeley2005; @spatstat]. The point patterns were saved as `.rds` object files.
 
 
-**Parent dataset:** PDGFR-β and GFAP-stained ischemic hemispheres imaged at 10x (with stitching). Samples are grouped at 0 (Sham), 3, 7, 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_10x_ROIs_Gfap-Pdgfrb.zip`.The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/8cn6s
+**Parent dataset:** PDGFRβ and GFAP-stained ischemic hemispheres imaged at 10x (with stitching). Samples are grouped at 0 (Sham), 3, 7, 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_10x_ROIs_Gfap-Pdgfrb.zip`.The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/8cn6s
 
 **Working dataset:** The `Data_Raw/Widefield_10x_ROIs_Gfap-Pdgfrb/Raw_Widefield_10x_ROIs_Gfap-Pdgfrb_Tessellations.csv`data frame containing cell counts in defined (low / high) GFAP tessellations. The data was generated using integrated functions in the spatstat package [@baddeley2005].
 
@@ -131,7 +131,7 @@ Plot_theme <- theme_classic() +
 
 # Load and handle the dataset
 
-We load and handle the `Raw_Widefield_10x_ROIs_Gfap-Pdgfrb_Tessellations.csv` dataset containing raw measurements performed in the `Widefield_10x_ROIs_Gfap-Pdgfrb_Handling.qmd` notebook using the `quadratcount` function to calculate the number of PDGFR-β in defined GFAP tessellations. We handle the dataset to extract the information from the image name and setup correctly the variables to analyze. Please note we exclude Sham (0D) animals, given that the covariance quantification are not suitable at this time point. 
+We load and handle the `Raw_Widefield_10x_ROIs_Gfap-Pdgfrb_Tessellations.csv` dataset containing raw measurements performed in the `Widefield_10x_ROIs_Gfap-Pdgfrb_Handling.qmd` notebook using the `quadratcount` function to calculate the number of PDGFRβ in defined GFAP tessellations. We handle the dataset to extract the information from the image name and setup correctly the variables to analyze. Please note we exclude Sham (0D) animals, given that the covariance quantification are not suitable at this time point. 
 ```{r}
 #| label: Pdgfr_TessTable
 #| include: true
@@ -191,7 +191,7 @@ gt::gt(Pdgfrb_Tess_Long[1:10,])
 
 ```
 
-The table contains the unique animal ID (MouseID), days post-ischemia (DPI), ROIs the image was taken in (Region), tessellation category [low or high] for GFAP expression (Gfap) and PDGFR-β cell counts (Pdgfrb).
+The table contains the unique animal ID (MouseID), days post-ischemia (DPI), ROIs the image was taken in (Region), tessellation category [low or high] for GFAP expression (Gfap) and PDGFRβ cell counts (Pdgfrb).
 
 # Exploratory data visualization
 
@@ -203,7 +203,7 @@ We visualize the data.
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Exploratory visualization for PDGFR-β/GFAP covariance
+#| fig-cap: Exploratory visualization for PDGFRβ/GFAP covariance
 #| fig-height: 5
 #| fig-width: 9
 
@@ -228,7 +228,7 @@ Pdgfrb_Gfap_Ridges <-
   scale_y_discrete(name= " DPI \n",
                      labels = c("3D", "7D", "14D", "30D")) +
   
-  scale_x_continuous(name="\n PDGFR-β / GFAP Covaiance") +
+  scale_x_continuous(name="\n PDGFRβ / GFAP Covaiance") +
   
   scale_fill_manual(values= c("cyan", "green"),
                         name="GFAP density",
@@ -251,11 +251,11 @@ facet_wrap(~ Region,
 Pdgfrb_Gfap_Ridges
 ```
 
-The cyan densities show that the ischemic cortex display more PDGFR-β+ cells in areas of low GFAP spatial intensity . This means that in the ischemic cortex, PDGFR-β cells are prominently located outside the GFAP convex hull, as shown by the analysis of 5x whole hemisphere images. Also, the plot for cortex gives an idea of the progressive increase up to 30 DPI of PDGFR-β in regions devoid from GFAP. Plese be aware of the difference of the scales.
+The cyan densities show that the ischemic cortex display more PDGFRβ+ cells in areas of low GFAP spatial intensity . This means that in the ischemic cortex, PDGFRβ cells are prominently located outside the GFAP convex hull, as shown by the analysis of 5x whole hemisphere images. Also, the plot for cortex gives an idea of the progressive increase up to 30 DPI of PDGFRβ in regions devoid from GFAP. Plese be aware of the difference of the scales.
 
 # Statistical modeling
 
-We perform Bayesian modeling with the `brms` package [@brms]using the default `brms` priors. We tested different conditions for the fit (not shown) which resulted in a high `Rhat`, meaning the chains did not converged as expected. We ponder the main reason for this is the broad variability for the interaction of DPI/GFAP density and region (three factors). Therefore, we fit independent models for each region to make a more accurate and informative scientific inference. Still our fist model is a regression on GFAP density and Region (with out considering the time course), to have an idea of the effect of the region in the allocation of PDGFR-β+ cells.
+We perform Bayesian modeling with the `brms` package [@brms]using the default `brms` priors. We tested different conditions for the fit (not shown) which resulted in a high `Rhat`, meaning the chains did not converged as expected. We ponder the main reason for this is the broad variability for the interaction of DPI/GFAP density and region (three factors). Therefore, we fit independent models for each region to make a more accurate and informative scientific inference. Still our fist model is a regression on GFAP density and Region (with out considering the time course), to have an idea of the effect of the region in the allocation of PDGFRβ+ cells.
 
 Given the nature of the data, we aimed to fit in the first place Poisson models to the data. However, as seen in @fig-Pdgfrb_LowHigh_Exploratory the overdispersion of the data is challenging for the unique $\lambda$ parameter governing both the mean and variation. Therefore, we choose to employ a hurdle_lognormal() distribution to account for the overdispersion of the parameter and also the number of low counts and zeros in the data set. 
 
@@ -466,7 +466,7 @@ We check models fitting with `pp_checks`
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: Model diagnostics for PDGFR-β / GFAP covarince
+#| fig-cap: Model diagnostics for PDGFRβ / GFAP covarince
 #| fig-height: 5
 #| fig-width: 12
 
@@ -526,7 +526,7 @@ In contrast to other analysis carried out for this research, the fitted models i
 
 ## Results for Region:DPI model
 
-In our first model (Pdgfrb \~ Region + Gfap + Region:Gfap) we attempt to find out the effect of region in the allocation of PDGFR-β+ cells. First, we generate a graph using the conditional effects function:
+In our first model (Pdgfrb \~ Region + Gfap + Region:Gfap) we attempt to find out the effect of region in the allocation of PDGFRβ+ cells. First, we generate a graph using the conditional effects function:
 
 ```{r}
 #| label: Pdgfr_Gfap_PlotRegions
@@ -547,7 +547,7 @@ Pdgfr_Gfap_Region_Fig <-
   
   #ggtitle("Regions") +
   
-  scale_y_continuous(name = "PDGFR-β cells",
+  scale_y_continuous(name = "PDGFRβ cells",
                      limits=c(0, 1200), 
                      breaks=seq(0,1200,300)) +
   
@@ -577,7 +577,7 @@ For the moment, we store the graph as an object to latter build a composite grap
 
 ### Calculate contrast between factor levels of interest
 
-We generate data tables containing the contrasts between the different levels of the predictor variables. We'll focus in the contrast related to the allocation of PDGFR-β+ cells in regions with Low GFAP spatial intensity.
+We generate data tables containing the contrasts between the different levels of the predictor variables. We'll focus in the contrast related to the allocation of PDGFRβ+ cells in regions with Low GFAP spatial intensity.
 
 ```{r}
 #| label: Pdgfrb_Gfap_ContrastRegions
@@ -696,7 +696,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Gfap_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Covariance between PDGFR-β and GFAP+ cells following MCAO",
+             title = "Covariance between PDGFRβ and GFAP+ cells following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Widefield_10x_ROIs_Gfap-Pdgfrb_Regions_Fit1_Table.html",
@@ -710,11 +710,11 @@ Pdgfrb_Gfap_Fit1_Table <- modelsummary(Pdgfrb_Gfap_Fit1,
              output = "gt")
 gt::gtsave (Pdgfrb_Gfap_Fit1_Table, filename = "Tables/tex/Widefield_10x_ROIs_Gfap-Pdgfrb_Regions_Table.tex")
 ```
-The results having `Region` (Perilesion, striatum, Cortex) and `Gfap` (Low, High) as predictors, show that the perilesion (intercept) exhibits 3.78 (95%CI = 3.52-4.04) (log count) PDGFR-β+ cells in Low GFAP density areas. In the striatum, the log count is 0.49 (95%CI = 0.12 - 0.85) units higher than in the perilesion, whereas these value augments to 1.06 (95%CI= 0.67 -1.46) in the cortex. Not surprisingly, the ischemic cortex is the region that exhibits more prominent PDGFR-β allocation.
+The results having `Region` (Perilesion, striatum, Cortex) and `Gfap` (Low, High) as predictors, show that the perilesion (intercept) exhibits 3.78 (95%CI = 3.52-4.04) (log count) PDGFRβ+ cells in Low GFAP density areas. In the striatum, the log count is 0.49 (95%CI = 0.12 - 0.85) units higher than in the perilesion, whereas these value augments to 1.06 (95%CI= 0.67 -1.46) in the cortex. Not surprisingly, the ischemic cortex is the region that exhibits more prominent PDGFRβ allocation.
 
-On the other hand, the effect of GFAP spatial intensity is signaled by the `Gfap.L`, which indicates a linear contrast between the two levels of the variable "Low" and "High". This imply that when GFAP changes form low to high, there is -0.47 (95%CI= -0.83 - -0.09) units in the log count of PDGFR-β+ cells assuming the effect is not mediated by Region. However, the interaction terms RegionStriatum:Gfap and RegionCortex:Gfap suggest there are disparities in the response in the striatum and cortex. The striatum display an additional increase (0.46, 95%CI= -0.07-0.97) of PDGFR-β+ cells when the GFAP spatial intensity goes from Low to High, compared to the perilesional regions. Specifically, the combined effect is: - 0.47 + 0.46 = -0.02.
+On the other hand, the effect of GFAP spatial intensity is signaled by the `Gfap.L`, which indicates a linear contrast between the two levels of the variable "Low" and "High". This imply that when GFAP changes form low to high, there is -0.47 (95%CI= -0.83 - -0.09) units in the log count of PDGFRβ+ cells assuming the effect is not mediated by Region. However, the interaction terms RegionStriatum:Gfap and RegionCortex:Gfap suggest there are disparities in the response in the striatum and cortex. The striatum display an additional increase (0.46, 95%CI= -0.07-0.97) of PDGFRβ+ cells when the GFAP spatial intensity goes from Low to High, compared to the perilesional regions. Specifically, the combined effect is: - 0.47 + 0.46 = -0.02.
 
-Conversely, the cortex display a reduction of -0.64 (95%CI= -1.20- - 0.06) units in the log count of PDGFR-β+ cells when GFAP changes from "Low" to "High" (compared to perilesion). Therefore, the effect of the spatial intensity of GFAP is contrary in striatum and cortex.
+Conversely, the cortex display a reduction of -0.64 (95%CI= -1.20- - 0.06) units in the log count of PDGFRβ+ cells when GFAP changes from "Low" to "High" (compared to perilesion). Therefore, the effect of the spatial intensity of GFAP is contrary in striatum and cortex.
 
 Please note that the results graph show the number of cells in the normal scale given the conversion performed by the `conditional_effects` function from `brms`. 
 
@@ -742,7 +742,7 @@ Pdgfrb_Gfap_Perilesion_Fig <-
   
   ggtitle("Perilesion") +
   
-  scale_y_continuous(name = "PDGFR-β cells",
+  scale_y_continuous(name = "PDGFRβ cells",
                      limits=c(0, 400), 
                      breaks=seq(0,400,80)) +
   
@@ -859,7 +859,7 @@ Next, we create the composite graph:
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Posterior for PDGFR-β+ cells in GFAP regions
+#| fig-cap: Posterior for PDGFRβ+ cells in GFAP regions
 #| fig-width: 6
 #| fig-height: 5
 
@@ -907,7 +907,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Gfap_Perilesion_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Covariance between PDGFR-β and GFAP+ cells in the perilesion following MCAO",
+             title = "Covariance between PDGFRβ and GFAP+ cells in the perilesion following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Widefield_10x_ROIs_Gfap-Pdgfrb_Perilesion_Table.html",
@@ -921,9 +921,9 @@ Pdgfrb_Gfap_Perilesion_Fit1_Table <- modelsummary(Pdgfrb_Gfap_Perilesion_Fit1,
              output = "gt")
 gt::gtsave (Pdgfrb_Gfap_Perilesion_Fit1_Table, filename = "Tables/tex/Widefield_10x_ROIs_Gfap-Pdgfrb_Perilesion_Table.tex")
 ```
-The results show a general increase in the number of PDGFR-β+ cells during the injury course, with a peak at 14D (0.52, 95%CI= -0.10 - 1.13), when GFAP spatial intensity is low, as shown in the previous model with `Region` as a predictor.
+The results show a general increase in the number of PDGFRβ+ cells during the injury course, with a peak at 14D (0.52, 95%CI= -0.10 - 1.13), when GFAP spatial intensity is low, as shown in the previous model with `Region` as a predictor.
 
-The effect of GFAP spatial intensity implies that when GFAP changes form low to high, there is -0.41 (95%CI= -1.05 - 0.25) units in the log count of PDGFR-β+ cells assuming the effect is not mediated by DPI. Then, the interaction terms for DPI shows a prominent effect at 30DPI (-0.28 + - 0.76 = -1.04), showing that the major difference between the number of PDGFR-β+ cells in low and high GFAP spatial intensity occur at this stage.     
+The effect of GFAP spatial intensity implies that when GFAP changes form low to high, there is -0.41 (95%CI= -1.05 - 0.25) units in the log count of PDGFRβ+ cells assuming the effect is not mediated by DPI. Then, the interaction terms for DPI shows a prominent effect at 30DPI (-0.28 + - 0.76 = -1.04), showing that the major difference between the number of PDGFRβ+ cells in low and high GFAP spatial intensity occur at this stage.     
 
 Please note that the results graph show the number of cells in the normal scale given the conversion performed by the `conditional_effects` function from `brms`. 
 
@@ -951,7 +951,7 @@ Pdgfrb_Gfap_Striatum_Fig <-
   
   ggtitle("Striatum") +
   
-  scale_y_continuous(name = "PDGFR-β cells",
+  scale_y_continuous(name = "PDGFRβ cells",
                      limits=c(0, 1000), 
                      breaks=seq(0,1000,300)) +
   
@@ -1063,7 +1063,7 @@ Finally, we create the composite graph:
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Posterior for PDGFR-β+ cells in GFAP regions
+#| fig-cap: Posterior for PDGFRβ+ cells in GFAP regions
 #| fig-width: 6
 #| fig-height: 5
 
@@ -1086,7 +1086,7 @@ Pdgfrb_Gfap_Striatum_Patch <-
  
 Pdgfrb_Gfap_Striatum_Patch
 ```
-The contrast for GFAP_Low shows a decrease in the cell counting up to 14D, denoting that PDGFR-β+ cells accompany GFAP reactive astrocytes in this region. 
+The contrast for GFAP_Low shows a decrease in the cell counting up to 14D, denoting that PDGFRβ+ cells accompany GFAP reactive astrocytes in this region. 
 
 ### Posterior summary
 
@@ -1110,7 +1110,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Gfap_Striatum_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Covariance between PDGFR-β and GFAP+ cells in the striatum following MCAO",
+             title = "Covariance between PDGFRβ and GFAP+ cells in the striatum following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Widefield_10x_ROIs_Gfap-Pdgfrb_Striatum_Table.html",
@@ -1125,7 +1125,7 @@ Pdgfrb_Gfap_Striatum_Fit1_Table <- modelsummary(Pdgfrb_Gfap_Striatum_Fit1,
 gt::gtsave (Pdgfrb_Gfap_Striatum_Fit1_Table, filename = "Tables/tex/Widefield_10x_ROIs_Gfap-Pdgfrb_Striatum_Table.tex")
 
 ```
-Similar to perilesion, the results for striatum show a general increase in the number of PDGFR-β+ cells during the injury course when GFAP spatial intensity is low. However, the magnitude of these changes is higher, and the peak is reached at 30D (1.28, 95%CI= 0.71 - 1.85). The effect of GFAP spatial intensity is also higher than in the perilesion -1.47 (95%CI= -2.08 - -0.87). Interestingly, the terms for the interaction between DPI and GFAP spatial intensity denote that the log counts for PDGFR-β+ cells increases progressively in areas of astrogliosis (GFAP_High) with a combined effect of -1.47 + 2.06 = 0.45 units. Please note that the results graph show the number of cells in the normal scale given the conversion performed by the `conditional_effects` function from `brms`. 
+Similar to perilesion, the results for striatum show a general increase in the number of PDGFRβ+ cells during the injury course when GFAP spatial intensity is low. However, the magnitude of these changes is higher, and the peak is reached at 30D (1.28, 95%CI= 0.71 - 1.85). The effect of GFAP spatial intensity is also higher than in the perilesion -1.47 (95%CI= -2.08 - -0.87). Interestingly, the terms for the interaction between DPI and GFAP spatial intensity denote that the log counts for PDGFRβ+ cells increases progressively in areas of astrogliosis (GFAP_High) with a combined effect of -1.47 + 2.06 = 0.45 units. Please note that the results graph show the number of cells in the normal scale given the conversion performed by the `conditional_effects` function from `brms`. 
 
 
 ## Results Cortex (DPI:GFAP) 
@@ -1151,7 +1151,7 @@ Pdgfrb_Gfap_Cortex_Fig <-
   
   ggtitle("Cortex") +
   
-  scale_y_continuous(name = "PDGFR-β cells",
+  scale_y_continuous(name = "PDGFRβ cells",
                      limits=c(0, 1500), 
                      breaks=seq(0,1500,300)) +
   
@@ -1304,7 +1304,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Gfap_Cortex_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Covariance between PDGFR-β and GFAP+ cells in the Cortex following MCAO",
+             title = "Covariance between PDGFRβ and GFAP+ cells in the Cortex following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Widefield_10x_ROIs_Gfap-Pdgfrb_Cortex_Table.html",
@@ -1361,7 +1361,7 @@ plot(PPP_ROIs_10x$Gfap_Dens$`140`, col = Gfap_Colmap, main = "30 DPI")
 plot(PPP_ROIs_10x$Pdgfr$`140`, pch = 16, cex = 0.4, col = "white", add = TRUE) 
 ```
 
-The black/white dots represent PDGFR-β+ cells, while the density kernels depict the GFAP spatial intensity.
+The black/white dots represent PDGFRβ+ cells, while the density kernels depict the GFAP spatial intensity.
 
 # References
 

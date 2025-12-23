@@ -448,15 +448,19 @@ CD31_Area_fig <- CD31_Area_14D %>%
   scale_x_continuous(name = "CD31 area (pixels)",
                      limits = c(2000, 7000),
                       breaks = seq(2000, 7000, 2000) ) +
+  
+  scale_y_discrete(name = "",
+    labels = c(expression('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
 
   scale_color_brewer() +
     Plot_theme +
-  theme (legend.position = c(0.8, 0.3))
+  theme (axis.text.y = element_text(angle = 45),
+    legend.position = c(0.8, 0.3))
 
 ggsave(
   plot     = CD31_Area_fig, 
   filename = "Plots/Widefield_10x_ROIs_CD31-ColIV/Widefield_10x_ROIs_CD31-ColIV_CD31_Area.png", 
-  width    = 8, 
+  width    = 11, 
   height   = 8, 
   units    = "cm")
 
@@ -471,13 +475,17 @@ CD31_Area_sigma <- grid %>%
   scale_x_continuous(name = "Sigma",
                      limits = c(0, 2500),
                       breaks = seq(0, 2500, 700) ) +
+  
+    scale_y_discrete(name = "",
+    labels = c(expression('KLF4'^"Flox"), expression('PDGFRβ'^"KLF4-KO"))) +
 
-  Plot_theme 
+  Plot_theme +
+  theme (axis.text.y = element_text(angle = 45))
  
 ggsave(
   plot     = CD31_Area_sigma, 
   filename = "Plots/Widefield_10x_ROIs_CD31-ColIV/Widefield_10x_ROIs_CD31-ColIV_CD31_Sigma.png", 
-  width    = 8, 
+  width    = 11, 
   height   = 8, 
   units    = "cm")
   
@@ -511,18 +519,19 @@ CD31_Area_Contrast <- CD31_Area_Fit2 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-1500, 2500),
                      breaks = seq(-1000, 1000, 1000) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = CD31_Area_Contrast , 
   filename = "Plots/Widefield_10x_ROIs_CD31-ColIV/Widefield_10x_ROIs_CD31-ColIV_CD31_contrast.png", 
-  width    = 7, 
-  height   = 7, 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 CD31_Area_Contrast 
@@ -828,18 +837,19 @@ ColIV_Area_Contrast <- ColIV_Area_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-1500, 3500),
                      breaks = seq(-1000, 3000, 2000) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+    legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = ColIV_Area_Contrast , 
   filename = "Plots/Widefield_10x_ROIs_CD31-ColIV/Widefield_10x_ROIs_CD31-ColIV_ColIV_contrast.png", 
-  width    = 7, 
-  height   = 7, 
+  width    = 8, 
+  height   = 8, 
   units    = "cm")
 
 ColIV_Area_Contrast 

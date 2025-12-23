@@ -851,6 +851,18 @@ Pdgfrb_Haralick_Convex <- plot(Pdgfrb_Haralick_Class,
 Pdgfrb_Haralick_Convex_fig <- Pdgfrb_Haralick_Convex  + 
   scale_y_continuous(name = expression ("P(Region)")) +
   scale_x_continuous(name="Entropy (scaled)") +
+      
+  scale_color_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  scale_fill_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  
   Plot_theme +
   theme(legend.position = "top", legend.direction = "horizontal")
 
@@ -869,6 +881,18 @@ Pdgfrb_Haralick_Branch <- plot(Pdgfrb_Haralick_Class,
 Pdgfrb_Haralick_Branch_fig <- Pdgfrb_Haralick_Branch  + 
   scale_y_continuous(name = expression ("P(Region)")) +
   scale_x_continuous(name="Contrast (scaled)") +
+  
+    scale_color_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  scale_fill_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  
   Plot_theme +
   theme(legend.position = "top", legend.direction = "horizontal")
 
@@ -887,6 +911,18 @@ Pdgfrb_Haralick_Inten <- plot(Pdgfrb_Haralick_Class,
 Pdgfrb_Haralick_Inten_fig <- Pdgfrb_Haralick_Inten  + 
   scale_y_continuous(name = expression ("Pr(Region)")) +
   scale_x_continuous(name="IDM (scaled)") +
+  
+  scale_color_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  scale_fill_manual(
+    values = c("#0048BA", "red", "darkgreen"),
+    labels = c("Perilesion", "Striatum", "Cortex"),
+    name="Region"
+    ) +
+  
   Plot_theme +
   theme(legend.position = "top", legend.direction = "horizontal")
 

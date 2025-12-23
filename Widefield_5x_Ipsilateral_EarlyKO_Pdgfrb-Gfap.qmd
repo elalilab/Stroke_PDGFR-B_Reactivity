@@ -49,7 +49,7 @@ bibliography: references.bib
 
 # Preview
 
-In this notebook, we perform the analysis of PDGFR-B and GFAP in the brain of KLF4 deficient mice.
+In this notebook, we perform the analysis of PDGFRβ and GFAP in the brain of KLF4 deficient mice.
 
 **Parent dataset:** PDGFRβ, NeuN, and GFAP stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped as KO (PDGFRβ/KLF4KO) and WT (Wild type controls). Sham animals were included as control. KLF4 was depleted using itraperitoneal injection 4 days before experimental cerebral ischemia. Mice were sacrificed 25 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_EarlyKO_Pdgfrb-NeuN-Gfap.zip`. Please note that the NeuN channel was not analyzed in the current notebook. 
 
@@ -213,7 +213,7 @@ Pdgfrb_box
 ```
 
 
-We see that cerebral ischemia increases PDGFR-B expression. However, we do not have clear signs that deficiency of KLF4 has an effect on its expression. 
+We see that cerebral ischemia increases PDGFRβ expression. However, we do not have clear signs that deficiency of KLF4 has an effect on its expression. 
 We exclude sham animals for further processing.
 
 ```{r}
@@ -230,7 +230,7 @@ $$
 Pdgfrb_i = \beta_0 + \beta_1 \times Genotype_i + \epsilon_i
 $$
 
-Where: $\beta_0$ is the intercept—baseline value for WT; $\beta_1$ is the effect size of KLF4-KO on PDGFR-B expression; and $\epsilon_i$ is the error term. Given our previous results for PDGFRβ-TdTomato animals, the model uses the default `brms` priors. 
+Where: $\beta_0$ is the intercept—baseline value for WT; $\beta_1$ is the effect size of KLF4-KO on PDGFRβ expression; and $\epsilon_i$ is the error term. Given our previous results for PDGFRβ-TdTomato animals, the model uses the default `brms` priors. 
 
 
 ### Fit the model
@@ -316,7 +316,7 @@ We observe no major deviations from the data in both cases. We can explore furth
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Conditional effects for PDGFR-B expression.
+#| fig-cap: Conditional effects for PDGFRβ expression.
 #| fig-height: 5
 #| fig-width: 10
 
@@ -335,12 +335,13 @@ Pdgfrb_Contrast <- Pdgfrb_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-150, 200),
                       breaks = seq(-150, 200, 80) ) +
 
   Plot_theme +
-  theme (legend.position = c(0.8, 0.8))
+  theme (axis.title.x = element_text(size = 14),
+        legend.position = c(0.8, 0.8))
 
 ggsave(
   plot     = Pdgfrb_Contrast, 
@@ -352,7 +353,7 @@ ggsave(
 Pdgfrb_Contrast
 ```
 
-@fig-Pdgfrb_CE shows that we have no evidence that KLF4 impacts PDGFR-B expression.
+@fig-Pdgfrb_CE shows that we have no evidence that KLF4 impacts PDGFRβ expression.
 
 ### Posterior summary
 
@@ -376,7 +377,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Fit1, 
              shape = term ~ model + statistic,
              centrality = "mean", 
-             title = "PDGFR-B expression in PDGFRβ-KLF4-KO mice",
+             title = "PDGFRβ expression in PDGFRβ-KLF4-KO mice",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Widefield_5x_Ipsilateral_EarlyKO_Pdgfrb-Gfap_Pdgfrb_Fit1_Table.html",
@@ -542,12 +543,13 @@ Gfap_Contrast <- Gfap_Fit1 %>%
     values = c("gray80", "skyblue"),
     labels = c("False", "True")) +
   scale_y_continuous(name = "Probability density") +
-  scale_x_continuous(name = "Contrast (KO-WT)",
+  scale_x_continuous(name = expression('PDGFRβ'^"KLF4-KO"~"-"~KLF4^"Flox"),
                      limits = c(-250, 250),
                       breaks = seq(-250, 250, 100) ) +
 
   Plot_theme +
   theme (
+    axis.title.x = element_text(size = 14),
     legend.position = c(0.8, 0.8),
     axis.text.x = element_text(colour = "black", 
                                size = 16, 

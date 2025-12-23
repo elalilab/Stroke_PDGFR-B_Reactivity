@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "Analysis of PDGFR-β morphology in defined ROIs"
+title: "Analysis of PDGFRβ morphology in defined ROIs"
 subtitle: "Data analysis notebook"
 date: today
 date-format: full
@@ -15,7 +15,7 @@ author:
         group: Laboratory of neurovascular interactions 
 note: "GitHub: https://daniel-manrique.github.io/" 
 keywords: 
-  - PDGFR-β
+  - PDGFRβ
   - PCA
   - Morphological analysis
   - Brain injury
@@ -48,9 +48,9 @@ bibliography: references.bib
 
 # Preview
 
-This notebook reports the morphological analysis of PDGFR-β+ cells in the striatum, cortex and perilesional regions.
+This notebook reports the morphological analysis of PDGFRβ+ cells in the striatum, cortex and perilesional regions.
 
-**Parent dataset:** PDGFR-β stained ROIs imaged at 40x using confocal microscopy. 
+**Parent dataset:** PDGFRβ stained ROIs imaged at 40x using confocal microscopy. 
 Animals were grouped at 0 (sham), 3, 7, 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Confocal_40x_ROIs_CD31-Pdgfrb-CD13.zip`.
 
 **Working dataset**: We employed a python-based analysis pipeline to perform image processing, threshold and cell segmentation (`Confocal_40x_ROIs_Pdgfrb-Morpho_Script`). The generated images were exported to ilastik [@berg2019] to perform object classification based on the following parameters (as defined by [ilastk](https://www.ilastik.org/documentation/objects/objectfeatures.html)):
@@ -298,7 +298,7 @@ After, we perform the principal component analysis using the `princomp` function
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Principal components for PDGFR-β+ morphology
+#| fig-cap: Principal components for PDGFRβ+ morphology
 #| fig-height: 4
 #| fig-width: 5
 
@@ -327,7 +327,7 @@ We can use a biplot to witness the similarities between the variables and its im
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Biplot for PDGFR-β+ morphology
+#| fig-cap: Biplot for PDGFRβ+ morphology
 #| fig-height: 4
 #| fig-width: 5
 
@@ -359,7 +359,7 @@ To create an sypder plot, we need to prepare the data in tiny format and summari
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Spyder plot for PDGFR-β+ morphology
+#| fig-cap: Spyder plot for PDGFRβ+ morphology
 #| fig-height: 4
 #| fig-width: 5
 
@@ -486,7 +486,7 @@ We check the model fitting with `pp_checks`
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Posterior predictive checks for PDGFR-β+ morphology
+#| fig-cap: Posterior predictive checks for PDGFRβ+ morphology
 #| fig-height: 4
 #| fig-width: 5
 
@@ -530,7 +530,7 @@ We plot the model using `conditional_effects` from the `brm`s package.
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Posterior predictive checks for PDGFR-β+ morphology
+#| fig-cap: Posterior predictive checks for PDGFRβ+ morphology
 #| fig-height: 5
 #| fig-width: 12
 
@@ -612,7 +612,7 @@ describe_posterior(
 modelsummary(Pdgfrb_Morphology_Fit1, 
              shape = term ~ model + statistic,
              centrali2ty = "mean", 
-             title = "Probability of PDGFR-β+ cells types following MCAO",
+             title = "Probability of PDGFRβ+ cells types following MCAO",
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "Tables/html/Confocal_40x_ROIs_Pdgfrb_Morph_Fit1_Table.html",

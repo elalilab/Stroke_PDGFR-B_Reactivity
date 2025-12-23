@@ -501,7 +501,7 @@ Gfap_Convex_Line_fig <-
     size  = 2.5, 
     alpha = 2/3) +
   
-  scale_y_continuous(name = "GFAP / conralateral area",
+  scale_y_continuous(name = "GFAP / contralateral area",
                      limits = c(30, 80)) +
   scale_x_continuous(name="DPI") +
   Plot_theme +

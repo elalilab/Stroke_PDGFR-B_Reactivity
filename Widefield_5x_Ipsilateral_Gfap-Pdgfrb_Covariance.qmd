@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "Point pattern analysis (PPA) of PDGFR-β and GFAP+ cells (ipsilateral hemisphere)"
+title: "Point pattern analysis (PPA) of PDGFRβ and GFAP+ cells (ipsilateral hemisphere)"
 subtitle: "Data analysis notebook"
 date: today
 date-format: full
@@ -50,12 +50,12 @@ editor:
 
 # Preview
 
-In this notebook we analyse point patterns generated from PDGFR-β and GFAP cells.
+In this notebook we analyse point patterns generated from PDGFRβ and GFAP cells.
 We performed automatic cell detection and classification using QuPath [@bankhead2017], and created point patterns the R-package `spatstat`[@spatstat-book; @baddeley2005]. The point patterns were saved as `.rds` object files.
 
-**Parent dataset:** PDGFR-β and GFAP-stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped at 0 (Sham), 3, 7, 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_Gfap-Pdgfrb.zip`. Individual cells were detected and classified into PDGFR-β^low^ (Pdgfrb_Neg) and PDGFR-β^high^ (Pdgfrb_Pos) using QuPath [@bankhead2017].The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/8ehyu.
+**Parent dataset:** PDGFRβ and GFAP-stained ischemic hemispheres imaged at 5x (with stitching). Samples are grouped at 0 (Sham), 3, 7, 14, and 30 days post-ischemia (DPI). The raw images and pre-processing scripts (if applicable) are available at the Zenodo repository (10.5281/zenodo.10553084) under the name `Widefield_5x_Ipsilateral_Gfap-Pdgfrb.zip`. Individual cells were detected and classified into PDGFRβ^low^ (Pdgfrb_Neg) and PDGFRβ^high^ (Pdgfrb_Pos) using QuPath [@bankhead2017].The complete QuPath project, including classifiers and output data as .tsv files is available at https://osf.io/8ehyu.
 
-**Working dataset:** PDGFR-β and GFAP point patterns derived from ischemic hemispheres and saved as a hyperframe .rds R-objects.
+**Working dataset:** PDGFRβ and GFAP point patterns derived from ischemic hemispheres and saved as a hyperframe .rds R-objects.
 
 # Install and load required packages
 
@@ -113,7 +113,7 @@ Plot_theme <- theme_classic() +
 
 # Load the dataset
 
-Here, we analyze the covariance between PDGFR-β and GFAP cells using function from the `spatstat` package [@baddeley2005; @spatstat-book].
+Here, we analyze the covariance between PDGFRβ and GFAP cells using function from the `spatstat` package [@baddeley2005; @spatstat-book].
 
 First, we load the point patterns:
 
@@ -137,9 +137,9 @@ The hyperframe contain the following columns:
 
 -   **"blank" (RowID):** This is a column with no name which contains the rows IDs, labeled as the unique animal ID.
 
--   **Pdgfr_High:** Point patterns for PDGFR-β_high (reactive) cells.
+-   **Pdgfr_High:** Point patterns for PDGFRβ_high (reactive) cells.
 
--   **Pdgfr_Low:** Point patterns for PDGFR-β_low (non-reactive) cells.
+-   **Pdgfr_Low:** Point patterns for PDGFRβ_low (non-reactive) cells.
 
 -   **Gfap:** Point patterns for GFAP+ cells.
 
@@ -171,7 +171,7 @@ Where:
 
 -   $K_h(u - x_i)$ is the kernel function scaled by the bandwidth $h$.
 
-We perform this calculation using the `density` function from `spatstat`. We judged a sigma (bandwidth) of 0.2 offers a fair readout for the point pattern density. We perform the same procedure for PDGFR-β^low^, PDGFR-β^high^ and GFAP.
+We perform this calculation using the `density` function from `spatstat`. We judged a sigma (bandwidth) of 0.2 offers a fair readout for the point pattern density. We perform the same procedure for PDGFRβ^low^, PDGFRβ^high^ and GFAP.
 
 ```{r}
 #| label: PPP_Pdgfrb_Density
@@ -188,14 +188,14 @@ PointPatterns$Gfap_Density <- with (PointPatterns, density(Gfap, sigma = 0.2))
 
 # Plot density kernels
 
-We use the default R plotting functions to visualize examples of the generated density kernels for PDGFR-β^low^ and PDGFR-β^high^.
+We use the default R plotting functions to visualize examples of the generated density kernels for PDGFRβ^low^ and PDGFRβ^high^.
 
 ```{r}
 #| label: fig-PPP_Pdgfrb_DensityPlots
 #| include: true
 #| warning: false
 #| message: false
-#| fig-cap: Example density kernels for PDGFR-β^low^ and PDGFR-β^high^
+#| fig-cap: Example density kernels for PDGFRβ^low^ and PDGFRβ^high^
 #| fig-height: 5
 #| fig-width: 9
 
@@ -219,11 +219,11 @@ plot(PointPatterns$Pdgfrb_High_Density$Td22, col = Pdgfrb_High_Colmap, main = ""
 plot(PointPatterns$Pdgfrb_High_Density$Td43, col = Pdgfrb_High_Colmap, main = "")  
 ```
 
-@fig-PPP_Pdgfrb_DensityPlots show in the upper row the PDGFR-β^low^ and at the button PDGFR-β^high^. Please note the dissimilar scales.As we can see, the response of PDGFR-β cells to injury is driven mainly by highly reactive cells. This offer us a ground to further explore this cell subset.
+@fig-PPP_Pdgfrb_DensityPlots show in the upper row the PDGFRβ^low^ and at the button PDGFRβ^high^. Please note the dissimilar scales.As we can see, the response of PDGFRβ cells to injury is driven mainly by highly reactive cells. This offer us a ground to further explore this cell subset.
 
-# Calculate relative distribution of PDGFR-β cells to astrocytes
+# Calculate relative distribution of PDGFRβ cells to astrocytes
 
-To calculate the relative distribution between PDGFR-β^high^/PDGFR-β^low^ and GFAP, we subset the hyperframe per DPI, given the limited functionality of the `rhohat` function in `spatstat`. Moreover, we exclude Sham animals from this analysis because GFAP staining is lacking in the healthy brain.
+To calculate the relative distribution between PDGFRβ^high^/PDGFRβ^low^ and GFAP, we subset the hyperframe per DPI, given the limited functionality of the `rhohat` function in `spatstat`. Moreover, we exclude Sham animals from this analysis because GFAP staining is lacking in the healthy brain.
 
 ```{r}
 #| label: PPP_Pdgfrb_Subset
@@ -244,7 +244,7 @@ PointPatterns_14D <- subset(PointPatterns_Sub, DPI=="14D", select = 1:9)
 PointPatterns_30D <- subset(PointPatterns_Sub, DPI=="30D", select = 1:9)
 ```
 
-Next, we calculate the relative distribution of PDGFR-β^high^ and PDGFR-β^low^ cells to astrocytes using the `rhohat` function from `spatstat`.
+Next, we calculate the relative distribution of PDGFRβ^high^ and PDGFRβ^low^ cells to astrocytes using the `rhohat` function from `spatstat`.
 
 When using **`rhohat`**, we can estimate the intensity function locally, taking into account the varying density of the surrounding points. In this way, the `rhohat` function provides an intensity estimate that reflects local structures in the data, including hotspots or areas of inhibition. Importantly, this function does not assume an uniform distribution of points across space.
 
@@ -266,7 +266,7 @@ Where:
 
 -   $w(x_i)$ is the weight function at point $x_i$, adjusting for inhomogeneity.
 
-In our case, we calculate such distribution for PDGFR-β^high^ and PDGFR-β^low^ conditional on the distribution of GFAP (`Gfap_Density`, density kernel of GFAP).
+In our case, we calculate such distribution for PDGFRβ^high^ and PDGFRβ^low^ conditional on the distribution of GFAP (`Gfap_Density`, density kernel of GFAP).
 We explicitly utilize `do.CI = FALSE` to pool the estimates by DPI later.
 
 ```{r}
@@ -313,7 +313,7 @@ Pdgfrb_Rhohat_30D_Low  <- with(PointPatterns_30D, spatstat.explore::rhohat.ppp(P
 Pdgfrb_Rhohat_30D_Low  <- pool(Pdgfrb_Rhohat_30D_Low)
 ```
 
-In this chunk, We had an unexpected code error for the calculation of the covariance between PDGFR-β^low^ and GFAP at 3 DPI. All the other calculations were performed successfully.
+In this chunk, We had an unexpected code error for the calculation of the covariance between PDGFRβ^low^ and GFAP at 3 DPI. All the other calculations were performed successfully.
 Next, we save the pooled rhohat plots.
 
 # Plot rhohat to astrocytes
@@ -620,7 +620,7 @@ Pdgfrb_Gfap_Low_Coeff <- coef (Pdgfrb_Gfap_Low_Mdl1)
 Pdgfrb_Gfap_Low_CI <- confint (Pdgfrb_Gfap_Low_Mdl1)
 ```
 
-We check the summary for PDGFR-β^high^
+We check the summary for PDGFRβ^high^
 
 ```{r}
 #| label: PPP_Pdgfrb_summary1
@@ -632,8 +632,8 @@ We check the summary for PDGFR-β^high^
 summary(Pdgfrb_Gfap_High_Mdl1)
 ```
 
-The model shows (on the log scale) that the spatial intensity of For PDGFR-β^high^ increases at 7 (2.02) and 14 (2.48) DPI compared to 3 DPI, controlling for GFAP density.
-The difference is smaller at 30 DPI (1.54). In addition, the interaction terms show a negative trend (-0.0014) in PDGFR-β^high^ spatial intensity for each unit increase in GFAP density at 3 DPI. This negative trend continues at 7 (-0.0018) and 14 (-0.00061) DPI until it is reversed at 30 DPI (0.0015). The data at 14 and 30 DPI show a progressive mixing of the cell populations.
+The model shows (on the log scale) that the spatial intensity of For PDGFRβ^high^ increases at 7 (2.02) and 14 (2.48) DPI compared to 3 DPI, controlling for GFAP density.
+The difference is smaller at 30 DPI (1.54). In addition, the interaction terms show a negative trend (-0.0014) in PDGFRβ^high^ spatial intensity for each unit increase in GFAP density at 3 DPI. This negative trend continues at 7 (-0.0018) and 14 (-0.00061) DPI until it is reversed at 30 DPI (0.0015). The data at 14 and 30 DPI show a progressive mixing of the cell populations.
 
 ```{r}
 #| label: PPP_Pdgfrb_summary2
@@ -645,7 +645,7 @@ The difference is smaller at 30 DPI (1.54). In addition, the interaction terms s
 summary(Pdgfrb_Gfap_Low_Mdl1)
 ```
 
-Otherwise, PDGFR-β^low^ display positive intercepts with a bigger uncertainty, suggesting a reduced spatial intensity for these cells and increasing allocation probability as the spatial intensity of GFAP increases.
+Otherwise, PDGFRβ^low^ display positive intercepts with a bigger uncertainty, suggesting a reduced spatial intensity for these cells and increasing allocation probability as the spatial intensity of GFAP increases.
 
 These mppm models can not be summarized by functions like `modelsummary` or `gt` summary. For these reason, we add a manually build table as supplementary material in the research article. 
 
