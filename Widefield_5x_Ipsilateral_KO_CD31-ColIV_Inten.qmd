@@ -474,7 +474,7 @@ ColIV_Int_Fit1_Table <- modelsummary(ColIV_Int_Fit1,
              statistic = "conf.int",
              gof_omit = 'ELPD|ELDP s.e|LOOIC|LOOIC s.e|WAIC|RMSE',
              output = "gt")
-gt::gtsave (ColIV_Int_Fit1_Table, filename = "Tables/tex/Widefield_5x_Ipsilateral_KO_ColIV_Inteb_Fit1_Table.tex")
+gt::gtsave (ColIV_Int_Fit1_Table, filename = "Tables/tex/Widefield_5x_Ipsilateral_KO_ColIV_Inten_Fit1_Table.tex")
 ```
 The table displays the effect of KOLF-KO in the spatial intensity of KLF4 and its respective uncertainty. We can appreciate there is not evidence of difference between genotypes (9.88, CI95% = -111 - 136). 
 

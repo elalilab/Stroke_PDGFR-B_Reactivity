@@ -1,6 +1,6 @@
 ---
 title-block-banner: true
-title: "FACS analysis of PDGFR-β+ live/deat cells"
+title: "FACS analysis of PDGFRβ+ live/deat cells"
 subtitle: "FACS processing notebook"
 date: today
 date-format: full
@@ -15,7 +15,7 @@ author:
         group: Laboratory of neurovascular interactions 
 note: "GitHub: https://daniel-manrique.github.io/"
 keywords: 
-  - PDGFR-β
+  - PDGFRβ
   - FACS
   - Brain injury
   - Bayesian modeling 
@@ -47,11 +47,11 @@ editor:
 
 # Preview
 
-In this notebook, we process the FACS files of PDGFR-β+ cells sorted from
+In this notebook, we process the FACS files of PDGFRβ+ cells sorted from
 the ipsilateral and contralateral hemispheres of ischemic
-PDGFR-β-TdTomato mice.
+PDGFRβ-TdTomato mice.
 
-**Parent dataset:** We sorted PDGFR-β+ from ischemic PDGFR-β-TdTomato
+**Parent dataset:** We sorted PDGFRβ+ from ischemic PDGFRβ-TdTomato
 animals at 14 DPI. We took coronal \~2 mm-tick sections of the
 ipsilateral hemisphere comprising the injured areas exclusively. We took
 analogous tissue from the contralateral hemisphere as a baseline control
@@ -60,7 +60,7 @@ controls) are available at the OSF repository in
 ['Datasets/FACS'](https://osf.io/zvnxa/).
 
 We perform scientific inference based on the percentage of Death
-PDGFR-β+ cells.
+PDGFRβ+ cells.
 
 # Install and load required packages
 
@@ -262,7 +262,7 @@ We see the scatter for all the samples.
 
 # Gating
 
-Now, we perform the gating of our samples. Given the objectives, we aim to achieve two gating steps. To select singlets, and PDGFR-β+ cells. After, w-ll obtain the percentage of dead cells in each brain. Given that our PDGFR-β signal is endogenous (not antibody-mediated) we do not deal with unspecific signal/staining of the samples. 
+Now, we perform the gating of our samples. Given the objectives, we aim to achieve two gating steps. To select singlets, and PDGFRβ+ cells. After, we'll obtain the percentage of dead cells in each brain. Given that our PDGFRβ signal is endogenous (not antibody-mediated) we do not deal with unspecific signal/staining of the samples. 
 
 ## Singlets gating
 
@@ -301,6 +301,7 @@ ggsave(
 Facs_Singlets 
 ```
 We plot an example to verify the gating. After verify it is coherent, we add the gates to the dataset.
+
 ```{r}
 #| label: fig-Facs_AddSingletGating
 #| include: true
@@ -340,7 +341,7 @@ ggsave(
   units    = "cm")
 ```
 
-## PDGFR-β gating
+## PDGFRβ gating
 
 ```{r}
 #| label: fig-Facs_PdgfrbGating
@@ -348,7 +349,7 @@ ggsave(
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: PDGFR-β gating
+#| fig-cap: PDGFRβ gating
 #| fig-height: 4
 #| fig-width: 6
 
@@ -446,7 +447,7 @@ Now, we plot all our samples
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: PDGFR-β gating
+#| fig-cap: PDGFRβ gating
 #| fig-height: 20
 #| fig-width: 20
 
@@ -571,14 +572,16 @@ Satisfied with the gating, we add it to the dataset tree.
 add(gs,g_dead,parent="Pdgfrb") # add gate to GatingSet
 recompute(gs) # recalculate Gatingset
 ```
-Next, we pot all the samples
+
+Next, we plot all the samples
+
 ```{r}
 #| label: fig-Facs_LiveDeadGatingAll
 #| include: true
 #| warning: false
 #| message: false
 #| results: false
-#| fig-cap: PDGFR-β gating
+#| fig-cap: PDGFRβ gating
 #| fig-height: 20
 #| fig-width: 20
 
@@ -592,7 +595,7 @@ Facs_Dead <- ggcyto(gs,
   geom_density2d(colour = "black") +
   ggcyto_par_set(limits = "instrument")+
   scale_x_continuous(name = "Live/dead") +
-  ggtitle("Parent population: PDGFR-β+") +
+  ggtitle("Parent population: PDGFRβ+") +
   facet_wrap(~ name, ncol = 3) +
   Plot_theme +
   theme(legend.position = c(0.85, 0.1))
@@ -620,10 +623,12 @@ Now, we get a summary table to perform scientific inference.
 # We create a gating-based data frame
 Summary <- gs_pop_get_count_with_meta(gs)
 
-# We generate the proportion parent/child popualtion
+# We generate the proportion parent/child population
 Summary <- Summary %>% mutate(percent_of_parent=Count/ParentCount)
 ```
-Now, we subset further the table to obtain the rows of interest (PDGFR-B and Dead cells)
+
+Now, we subset further the table to obtain the rows of interest (PDGFRβ and Dead cells)
+
 ```{r}
 #| label: fig-Facs_Tables
 #| include: true
